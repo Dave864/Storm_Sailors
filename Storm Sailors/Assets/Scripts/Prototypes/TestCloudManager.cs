@@ -74,7 +74,7 @@ public class TestCloudManager : MonoBehaviour {
     // Dispel a thunderhead at pos
     public void DispelThunderhead(Vector2 cardinalPos)
     {
-        if (curCloudCnt < 0)
+        if (curCloudCnt > 0)
         {
             if (thunderheadPos.ContainsKey(cardinalPos))
             {

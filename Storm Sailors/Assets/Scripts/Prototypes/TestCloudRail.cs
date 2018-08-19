@@ -7,7 +7,6 @@ public class TestCloudRail : MonoBehaviour
     public float railRadius = 2;                    // Adjustable radius of cloud rail; to be matched with the cloud rail sprite
     public float rotRate = 0.1f;                    // The time in sec of each rotation about the center
     public Vector2 strtPos = new Vector2(0, 1);     // Intial orientation of the center of the cloud rail; TODO: implement further usage in editor (post jam)
-    private Vector2 rotVel = new Vector2(0, 0);     // The current velocity of the rotation about the center
 
     // Holds rotations corresponding to the positions that the wizard can be at on the cloud rail
     private Dictionary<Vector2, float> cardinalPositions = new Dictionary<Vector2, float>();

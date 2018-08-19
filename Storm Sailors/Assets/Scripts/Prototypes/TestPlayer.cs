@@ -19,8 +19,6 @@ public class TestPlayer : MonoBehaviour
     private float rotRate;                          // The used time it takes to change position in sec
     private Vector2 curPosVect;                     // The current position of the wizard
     private Vector2 desPosVect;                     // The desired position of the wizard
-    private Vector2 strtPosVect;                    // The starting position of a move
-    private Vector2 posVectVel;                     // The velocity of a changing position
 
     // Use this for initialization
     void Start()
@@ -35,8 +33,6 @@ public class TestPlayer : MonoBehaviour
         rotRate = (railCenter == null) ? defaultRotRate : railCenter.GetComponent<TestCloudRail>().rotRate;
         curPosVect = new Vector2(wizard.transform.position.x, wizard.transform.position.z).normalized;
         desPosVect = new Vector2(curPosVect.x, curPosVect.y);
-        strtPosVect = new Vector2(curPosVect.x, curPosVect.y);
-        posVectVel = new Vector2(0, 0);
     }
 	
 	// Update is called once per frame
@@ -51,22 +47,20 @@ public class TestPlayer : MonoBehaviour
         if (!isPositioning && posVect != new Vector2(0, 0))
         {
             desPosVect = new Vector2(posVect.x, posVect.y);
-            strtPosVect = curPosVect;
             isPositioning = true;
         }
 
         // Reposition the player components
         if (isPositioning)
         {
-            StartCoroutine(Position(strtPosVect, desPosVect));
+            StartCoroutine(Position(desPosVect));
         }
     }
 
     // Repositions the wizard
-    IEnumerator Position(Vector2 strtPos, Vector2 endPos)
+    IEnumerator Position(Vector2 endPos)
     {
         // Set up the start and end rotations
-        float strtAngle = railCenter.GetComponent<TestCloudRail>().PositionAngle(strtPos);
         float endAngle = railCenter.GetComponent<TestCloudRail>().PositionAngle(endPos);
         Quaternion strtRot = railCenter.transform.rotation;
         Quaternion endRot = Quaternion.Euler(new Vector3(0, endAngle, 0));
