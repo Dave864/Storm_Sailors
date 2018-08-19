@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class TestPlayer : MonoBehaviour
 {
+    // State variables for keeping track of what is happening
+    private bool isPositioning = false;
+
     // References to components of player
     private GameObject railCenter;
     private GameObject wizard;
     private GameObject ship;
 
     // Movement parameters
-    private readonly int defaultSpeed = 500;        // The default speed of the ship
-    private readonly float defaultRotRate = 0.1f;   // The default time in sec of a change in position
-    private int baseSpeed;
-    private float rotRate;
+    private readonly int defaultSpeed = 500;        // The default base speed of the ship
+    private readonly float defaultRotRate = 0.1f;   // The default time it takes to change position in sec
+    private int baseSpeed;                          // The used base speed of the ship
+    private float rotRate;                          // The used time it takes to change position in sec
     private Vector2 curPosVect;                     // The current position of the wizard
     private Vector2 desPosVect;                     // The desired position of the wizard
     private Vector2 strtPosVect;                    // The starting position of a move
     private Vector2 posVectVel;                     // The velocity of a changing position
-
-    // Keeps track of time spent repositioning
-    private float posTime = 0;
 
     // Use this for initialization
     void Start()
@@ -43,40 +43,52 @@ public class TestPlayer : MonoBehaviour
 	void Update()
     {
         // Construct position vector from input
-        float hInput = Input.GetAxis("Horizontal");
-        float vInput = Input.GetAxis("Vertical");
-        Vector2 posVect = new Vector2(Mathf.Round(hInput), Mathf.Round(vInput)).normalized;
+        float hInput = Input.GetAxisRaw("Horizontal");
+        float vInput = Input.GetAxisRaw("Vertical");
+        Vector2 posVect = new Vector2(Mathf.Round(hInput), Mathf.Round(vInput));
 
-        // Set up the start and end positions
-        if (posVect != new Vector2(0, 0))
+        // Set up the start and end positions if not already repositioning
+        if (!isPositioning && posVect != new Vector2(0, 0))
         {
-            desPosVect = posVect;
+            desPosVect = new Vector2(posVect.x, posVect.y);
             strtPosVect = curPosVect;
+            isPositioning = true;
         }
 
-        // Move the player components
-        if (desPosVect != curPosVect)
+        // Reposition the player components
+        if (isPositioning)
         {
-            // Reposition Wizard
+            StartCoroutine(Position(strtPosVect, desPosVect));
+        }
+    }
+
+    IEnumerator Position(Vector2 strtPos, Vector2 endPos)
+    {
+        // Set up the start and end rotations
+        float strtAngle = railCenter.GetComponent<TestCloudRail>().PositionAngle(strtPos);
+        float endAngle = railCenter.GetComponent<TestCloudRail>().PositionAngle(endPos);
+        Quaternion strtRot = railCenter.transform.rotation;
+        Quaternion endRot = Quaternion.Euler(new Vector3(0, endAngle, 0));
+
+        for (float posTime = 0; posTime < rotRate; posTime += Time.deltaTime)
+        {
+            // Rotate the Wizard to face the center of the rail
             if (wizard != null)
             {
 
             }
+            // Rotate the center of the rail to position the wizard
             if (railCenter != null)
             {
-
+                railCenter.transform.rotation = Quaternion.Slerp(strtRot, endRot, posTime / rotRate);
             }
-
-            // Rotate Ship
-            if (ship != null)
-            {
-
-            }
-
-            // Update curPosVect
-            //curPosVect = Vector2.SmoothDamp(curPosVect, desPosVect, ref posVectVel, rotRate, Mathf.Infinity, Time.deltaTime);
-
-            // Move Player
+            yield return null;
         }
+        // update the current position
+        curPosVect = endPos;
+
+        // Reset timer and state flags
+        isPositioning = false;
+        yield return null;
     }
 }
