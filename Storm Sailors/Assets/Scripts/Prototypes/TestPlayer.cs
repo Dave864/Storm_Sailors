@@ -27,7 +27,7 @@ public class TestPlayer : MonoBehaviour
     {
         // Establish the references to the components
         railCenter = gameObject.transform.Find("Cloud Rail/Rail Center").gameObject;
-        wizard = gameObject.transform.Find("Cloud Rail/Rail Center/Wizard").gameObject;
+        wizard = gameObject.transform.Find("Cloud Rail/Rail Center/Wizard Entity").gameObject;
         ship = gameObject.transform.Find("Ship").gameObject;
 
         // Initialize the movement parameters

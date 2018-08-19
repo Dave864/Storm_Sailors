@@ -12,8 +12,8 @@ public class TestWizard : MonoBehaviour
         // Position the wizard at the radius of the cloud rail
         railCenter = GameObject.Find("Rail Center");
         float newXPos = railCenter.transform.position.x;
-        float newYPos = railCenter.transform.position.y + 0.2f;
-        float newZPos = railCenter.GetComponent<TestCloudRail>().railRadius;
+        float newYPos = railCenter.GetComponent<TestCloudRail>().railRadius;
+        float newZPos = railCenter.transform.position.z;
         transform.position = new Vector3(newXPos, newYPos, newZPos);
 	}
 	
