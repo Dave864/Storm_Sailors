@@ -62,6 +62,7 @@ public class TestPlayer : MonoBehaviour
         }
     }
 
+    // Repositions the wizard
     IEnumerator Position(Vector2 strtPos, Vector2 endPos)
     {
         // Set up the start and end rotations
@@ -72,11 +73,6 @@ public class TestPlayer : MonoBehaviour
 
         for (float posTime = 0; posTime < rotRate; posTime += Time.deltaTime)
         {
-            // Rotate the Wizard to face the center of the rail
-            if (wizard != null)
-            {
-
-            }
             // Rotate the center of the rail to position the wizard
             if (railCenter != null)
             {
@@ -84,6 +80,13 @@ public class TestPlayer : MonoBehaviour
             }
             yield return null;
         }
+
+        // Update the position of the wizard
+        if (wizard != null)
+        {
+            wizard.GetComponent<TestWizard>().SetPosition(endPos);
+        }
+
         // update the current position
         curPosVect = endPos;
 
