@@ -295,8 +295,8 @@ InputManager:
     joyNum: 0
   - serializedVersion: 3
     m_Name: Summon
-    descriptiveName: Spawns a thunderhead at the wizard's position.
-    descriptiveNegativeName: Dispels any thunderhead at the wizard's position.
+    descriptiveName: Spawns/dispels a thunderhead at the wizard's position.
+    descriptiveNegativeName: 
     negativeButton: 
     positiveButton: space
     altNegativeButton: 

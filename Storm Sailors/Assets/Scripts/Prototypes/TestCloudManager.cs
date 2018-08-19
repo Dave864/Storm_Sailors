@@ -60,10 +60,10 @@ public class TestCloudManager : MonoBehaviour {
                 if (thunderheadPos[cardinalPos] == null)
                 {
                     Vector3 wizardPos = wizard.transform.position;
-                    Quaternion thunderheadRotation = Quaternion.LookRotation(railCenter.transform.position, Vector3.up);
 
                     // Instantiate thunderhead at position of wizard
-                    GameObject newThunderhead = Instantiate(thunderheadPrefab, wizard.transform.position, thunderheadRotation, transform);
+                    GameObject newThunderhead = Instantiate(thunderheadPrefab, wizard.transform.position, Quaternion.identity, transform);
+                    newThunderhead.transform.LookAt(railCenter.transform, Vector3.up);
                     thunderheadPos[cardinalPos] = newThunderhead;
                     curCloudCnt++;
                 }
