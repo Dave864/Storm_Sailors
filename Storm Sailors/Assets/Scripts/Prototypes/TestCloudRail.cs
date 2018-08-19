@@ -15,16 +15,16 @@ public class TestCloudRail : MonoBehaviour
     {
         // Set the initial center rotation to be at position N
         transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, 1), transform.up);
-        
+
         // Initialize the cardinalPositions dictionary
         cardinalPositions.Add(new Vector2(0, 1), 0.0f);     // position N
-        cardinalPositions.Add(new Vector2(1, 1), 45.0f);   // position NE
-        cardinalPositions.Add(new Vector2(1, 0), 90.0f);   // position E
-        cardinalPositions.Add(new Vector2(1, -1), 135.0f); // position SE
+        cardinalPositions.Add(new Vector2(1, 1), 45.0f);    // position NE
+        cardinalPositions.Add(new Vector2(1, 0), 90.0f);    // position E
+        cardinalPositions.Add(new Vector2(1, -1), 135.0f);  // position SE
         cardinalPositions.Add(new Vector2(0, -1), 180.0f);  // position S
-        cardinalPositions.Add(new Vector2(-1, -1), 225.0f);  // position SW
-        cardinalPositions.Add(new Vector2(-1, 0), 270.0f);   // position W
-        cardinalPositions.Add(new Vector2(-1, 1), 315.0f);   // position NW
+        cardinalPositions.Add(new Vector2(-1, -1), 225.0f); // position SW
+        cardinalPositions.Add(new Vector2(-1, 0), 270.0f);  // position W
+        cardinalPositions.Add(new Vector2(-1, 1), 315.0f);  // position NW
     }
 
     // Returrns the angle of the position with respect to position N
