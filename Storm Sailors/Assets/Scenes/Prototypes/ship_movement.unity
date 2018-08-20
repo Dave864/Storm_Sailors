@@ -411,7 +411,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 201af430225cdad4582fe11bd7bf991f, type: 2}
+  - {fileID: 2100000, guid: 5a4a790069d8b4d4e97050d3fc3e4010, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -462,7 +462,7 @@ Transform:
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1461380012
 GameObject:
@@ -550,8 +550,8 @@ Transform:
   m_LocalPosition: {x: -6.13, y: 16.32, z: 17.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_Father: {fileID: 1596481859}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 30.000002, y: 165.576, z: 0}
 --- !u!4 &1467475641 stripped
 Transform:
@@ -585,8 +585,9 @@ Transform:
   m_Children:
   - {fileID: 278019192}
   - {fileID: 1715934249}
+  - {fileID: 1461380017}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1596481860
 MonoBehaviour:
@@ -613,8 +614,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5.629271, y: 1.5782688, z: 2.000001}
-  m_Center: {x: 0.07350244, y: 0.78913414, z: -0.011904332}
+  m_Size: {x: 6, y: 1.6, z: 2.1}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1715934248
 GameObject:
   m_ObjectHideFlags: 0
@@ -763,5 +764,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 65, y: 30, z: 0}
