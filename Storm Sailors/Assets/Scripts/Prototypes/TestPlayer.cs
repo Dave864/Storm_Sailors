@@ -7,8 +7,12 @@ public class TestPlayer : MonoBehaviour
     // State variables
     private bool isPositioning = false;
 
+    // Start area reference
+    public GameObject startArea = null;
+
     // References to components of player
     private GameObject railCenter;
+    private GameObject cloudManager;
     private GameObject wizard;
     private GameObject ship;
 
@@ -27,12 +31,16 @@ public class TestPlayer : MonoBehaviour
         railCenter = gameObject.transform.Find("Cloud Rail/Rail Center").gameObject;
         wizard = gameObject.transform.Find("Cloud Rail/Rail Center/Wizard Entity").gameObject;
         ship = gameObject.transform.Find("Ship").gameObject;
+        cloudManager = gameObject.transform.Find("Cloud Rail/Cloud Manager").gameObject;
 
         // Initialize the movement parameters
         baseSpeed = (ship == null) ? defaultSpeed : ship.GetComponent<TestShip>().baseSpeed;
         rotRate = (railCenter == null) ? defaultRotRate : railCenter.GetComponent<TestCloudRail>().rotRate;
         curWizardPos = new Vector2(wizard.transform.position.x, wizard.transform.position.z).normalized;
         desWizardPos = new Vector2(curWizardPos.x, curWizardPos.y);
+
+        // Set initial position of player
+        transform.position = new Vector3(startArea.transform.position.x, transform.position.y, startArea.transform.position.z);
     }
 	
 	// Update is called once per frame
@@ -90,5 +98,16 @@ public class TestPlayer : MonoBehaviour
         // Reset timer and state flags
         isPositioning = false;
         yield return null;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Hit");
+        // Go back to start if ship hit an obstacle
+        if (other.tag == "Obstacle")
+        {
+            cloudManager.GetComponent<TestCloudManager>().DispelAll();
+            transform.position = new Vector3(startArea.transform.position.x, transform.position.y, startArea.transform.position.z);
+        }
     }
 }

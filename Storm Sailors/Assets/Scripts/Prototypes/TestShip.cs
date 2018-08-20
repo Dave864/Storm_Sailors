@@ -68,4 +68,15 @@ public class TestShip : MonoBehaviour
         shipIsRotating = false;
         yield return null;
     }
+
+    private void OnTriggerEnter(Collider obj)
+    {
+        // Go back to start if ship hit an obstacle
+        if (obj.gameObject.CompareTag("Obstacle"))
+        {
+            //cloudManager.GetComponent<TestCloudManager>().DispelAll();
+            GameObject startArea = GetComponentInParent<TestPlayer>().startArea;
+            transform.parent.position = new Vector3(startArea.transform.position.x, transform.parent.position.y, startArea.transform.position.z);
+        }
+    }
 }

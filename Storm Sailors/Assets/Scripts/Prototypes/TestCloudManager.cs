@@ -102,4 +102,15 @@ public class TestCloudManager : MonoBehaviour {
             }
         }
     }
+
+    // Dispel all spawned thunderheads
+    public void DispelAll()
+    {
+        CombinedGaleVector = Vector3.zero;
+        foreach (KeyValuePair<Vector2, GameObject> cloud in thunderheadPos)
+        {
+            Destroy(thunderheadPos[cloud.Key]);
+            thunderheadPos[cloud.Key] = null;
+        }
+    }
 }
