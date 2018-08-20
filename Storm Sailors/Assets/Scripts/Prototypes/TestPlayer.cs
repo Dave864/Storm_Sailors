@@ -55,6 +55,9 @@ public class TestPlayer : MonoBehaviour
         {
             StartCoroutine(Position(desWizardPos));
         }
+
+        // Move the player entity based off of the heading of the ship
+        transform.position += ship.GetComponent<TestShip>().CurHeading * baseSpeed * Time.deltaTime;
     }
 
     // Repositions the wizard

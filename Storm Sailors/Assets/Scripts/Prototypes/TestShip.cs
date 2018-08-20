@@ -12,29 +12,31 @@ public class TestShip : MonoBehaviour
     public float uTurnTime = 1.0f;  // The time for the ship to turn 180 degrees in seconds; TODO: min value in editor (post jam)
     private float turnRate;         // The turning rate in deg / sec
 
-    // The current diraction vector of the ship
-    private Vector3 curHeading;
+    // The current direction vector of the ship
+    public Vector3 CurHeading { get; set; }
 
     // Reference to Cloud Manager, which handles calculating the gale vector
     private GameObject cloudManager;
 
 	// Use this for initialization
-	void Start () {
+	void Start()
+    {
         turnRate = 180.0f / uTurnTime;
         cloudManager = GameObject.Find("Cloud Manager");
-        curHeading = transform.forward;
+        CurHeading = transform.forward.normalized;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        Vector3 galeDir = cloudManager.GetComponent<TestCloudManager>().CombinedGaleVector;
+	void Update()
+    {
+        Vector3 galeDir = cloudManager.GetComponent<TestCloudManager>().CombinedGaleVector.normalized;
         // Set heading to zero if there is no gale
         if (galeDir == Vector3.zero)
         {
-            curHeading = Vector3.zero;
+            CurHeading = Vector3.zero;
         }
         // Set heading to match galeDir
-        else if(!shipIsRotating && galeDir.normalized != curHeading.normalized)
+        else if (!shipIsRotating && galeDir != CurHeading)
         {
             StartCoroutine(RotateShip(galeDir));
         }
@@ -58,8 +60,11 @@ public class TestShip : MonoBehaviour
         for (float curTime = 0; curTime < rotTime; curTime += Time.deltaTime)
         {
             transform.rotation = Quaternion.Slerp(strtRotation, endRotation, curTime / rotTime);
+            CurHeading = transform.forward.normalized;
             yield return null;
         }
+        CurHeading = transform.forward.normalized;
+
         shipIsRotating = false;
         yield return null;
     }
