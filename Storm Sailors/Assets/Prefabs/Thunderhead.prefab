@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4089728112223066}
-  - component: {fileID: 114672691946727104}
+  - component: {fileID: 114386010834498682}
   m_Layer: 0
   m_Name: Thunderhead
   m_TagString: Untagged
@@ -141,7 +141,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1767136968636330}
   m_Mesh: {fileID: 4300002, guid: b9fb74072f47f0445aa993ca97fd4b42, type: 3}
---- !u!114 &114672691946727104
+--- !u!114 &114386010834498682
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -152,7 +152,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15fb0c075bea43439424b6f9c93ed9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  galeVector: {x: 0, y: 0, z: 0}
 --- !u!198 &198786597595921148
 ParticleSystem:
   m_ObjectHideFlags: 1

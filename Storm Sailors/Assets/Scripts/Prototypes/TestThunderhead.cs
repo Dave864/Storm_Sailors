@@ -5,11 +5,21 @@ using UnityEngine;
 public class TestThunderhead : MonoBehaviour
 {
     // Direction the thunderhead blows the wind
-    [HideInInspector] public Vector3 galeVector = new Vector3(0, 0, 0);
+    private Vector3 galeVector = new Vector3(0, 0, 0);
 
-    // Initialize thunderhead
-    private void Start()
+    public Vector3 GaleVector
     {
-        galeVector = transform.rotation.eulerAngles;
+        get
+        {
+            return galeVector;
+        }
+    }
+
+    private void Awake()
+    {
+        // Initialize gale vector
+        //GameObject railCenter = GameObject.Find("Rail Center");
+        //galeVector = railCenter.transform.position - transform.position;
+        galeVector = transform.forward;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TestPlayer : MonoBehaviour
 {
-    // State variables for keeping track of what is happening
+    // State variables
     private bool isPositioning = false;
 
     // References to components of player
@@ -14,11 +14,11 @@ public class TestPlayer : MonoBehaviour
 
     // Movement parameters
     private readonly int defaultSpeed = 500;        // The default base speed of the ship
-    private readonly float defaultRotRate = 0.1f;   // The default time it takes to change position in sec
+    private readonly float defaultRotRate = 0.1f;   // The default time it takes to change wizard position in sec
     private int baseSpeed;                          // The used base speed of the ship
-    private float rotRate;                          // The used time it takes to change position in sec
-    private Vector2 curPosVect;                     // The current position of the wizard
-    private Vector2 desPosVect;                     // The desired position of the wizard
+    private float rotRate;                          // The used time it takes to change wizard position in sec
+    private Vector2 curWizardPos;                   // The current position of the wizard
+    private Vector2 desWizardPos;                   // The desired position of the wizard
 
     // Use this for initialization
     void Start()
@@ -31,8 +31,8 @@ public class TestPlayer : MonoBehaviour
         // Initialize the movement parameters
         baseSpeed = (ship == null) ? defaultSpeed : ship.GetComponent<TestShip>().baseSpeed;
         rotRate = (railCenter == null) ? defaultRotRate : railCenter.GetComponent<TestCloudRail>().rotRate;
-        curPosVect = new Vector2(wizard.transform.position.x, wizard.transform.position.z).normalized;
-        desPosVect = new Vector2(curPosVect.x, curPosVect.y);
+        curWizardPos = new Vector2(wizard.transform.position.x, wizard.transform.position.z).normalized;
+        desWizardPos = new Vector2(curWizardPos.x, curWizardPos.y);
     }
 	
 	// Update is called once per frame
@@ -46,14 +46,14 @@ public class TestPlayer : MonoBehaviour
         // Set up the start and end positions if not already repositioning
         if (!isPositioning && posVect != new Vector2(0, 0))
         {
-            desPosVect = new Vector2(posVect.x, posVect.y);
+            desWizardPos = new Vector2(posVect.x, posVect.y);
             isPositioning = true;
         }
 
         // Reposition the player components
         if (isPositioning)
         {
-            StartCoroutine(Position(desPosVect));
+            StartCoroutine(Position(desWizardPos));
         }
     }
 
@@ -81,8 +81,8 @@ public class TestPlayer : MonoBehaviour
             wizard.GetComponent<TestWizard>().SetPosition(endPos);
         }
 
-        // update the current position
-        curPosVect = endPos;
+        // update the current wizard position
+        curWizardPos = endPos;
 
         // Reset timer and state flags
         isPositioning = false;

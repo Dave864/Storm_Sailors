@@ -6,7 +6,11 @@ public class TestCloudManager : MonoBehaviour {
     // Variables for managing spawned clouds
     public int maxCloudCnt = 3;
     private int curCloudCnt = 0;
+    public float dipVal = 0.5f; // TODO: put a limit on how big this can be in editor (after jam)
     public GameObject thunderheadPrefab;
+
+    // Vector resulting from combined gale vectors of thunderheads
+    [HideInInspector] public Vector3 CombinedGaleVector { get; set; }
 
     // Container for keeping track of spawned thunderheads
     private Dictionary<Vector2, GameObject> thunderheadPos = new Dictionary<Vector2, GameObject>();
@@ -24,6 +28,9 @@ public class TestCloudManager : MonoBehaviour {
         {
             maxCloudCnt = 8;
         }
+
+        // Initialize combined gale vector
+        CombinedGaleVector = new Vector3(0, 0, 0);
 
         // Establish reference to game objects
         railCenter = GameObject.Find("Cloud Rail");
@@ -63,9 +70,17 @@ public class TestCloudManager : MonoBehaviour {
 
                     // Instantiate thunderhead at position of wizard
                     GameObject newThunderhead = Instantiate(thunderheadPrefab, wizard.transform.position, Quaternion.identity, transform);
+                    newThunderhead.transform.position = new Vector3(wizard.transform.position.x, wizard.transform.position.y - dipVal, wizard.transform.position.z);
+
+                    // Rotate thunderhead so it looks at the center of the cloud rail
                     newThunderhead.transform.LookAt(railCenter.transform, Vector3.up);
+
+                    // Add thunderhead to container
                     thunderheadPos[cardinalPos] = newThunderhead;
                     curCloudCnt++;
+
+                    // Update combined gale vector
+                    CombinedGaleVector += newThunderhead.GetComponent<TestThunderhead>().GaleVector;
                 }
             }
         }
@@ -78,6 +93,9 @@ public class TestCloudManager : MonoBehaviour {
         {
             if (thunderheadPos.ContainsKey(cardinalPos))
             {
+                // Update combined gale vector
+                CombinedGaleVector -= thunderheadPos[cardinalPos].GetComponent<TestThunderhead>().GaleVector;
+                // Dispel thunderhead
                 Destroy(thunderheadPos[cardinalPos]);
                 thunderheadPos[cardinalPos] = null;
                 curCloudCnt--;
