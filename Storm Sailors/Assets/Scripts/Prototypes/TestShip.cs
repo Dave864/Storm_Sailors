@@ -12,7 +12,7 @@ public class TestShip : MonoBehaviour
     public float uTurnTime = 1.0f;  // The time for the ship to turn 180 degrees in seconds; TODO: min value in editor (post jam)
     private float turnRate;         // The turning rate in deg / sec
 
-    // The direction the ship is currently facing
+    // The current diraction vector of the ship
     private Vector3 curHeading;
 
     // Reference to Cloud Manager, which handles calculating the gale vector
@@ -23,7 +23,6 @@ public class TestShip : MonoBehaviour
         turnRate = 180.0f / uTurnTime;
         cloudManager = GameObject.Find("Cloud Manager");
         curHeading = transform.forward;
-        Debug.Log("Cur Heading" + curHeading);
 	}
 	
 	// Update is called once per frame
