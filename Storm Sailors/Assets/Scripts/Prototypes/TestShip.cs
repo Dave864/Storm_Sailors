@@ -23,12 +23,19 @@ public class TestShip : MonoBehaviour
         turnRate = 180.0f / uTurnTime;
         cloudManager = GameObject.Find("Cloud Manager");
         curHeading = transform.forward;
+        Debug.Log("Cur Heading" + curHeading);
 	}
 	
 	// Update is called once per frame
 	void Update () {
         Vector3 galeDir = cloudManager.GetComponent<TestCloudManager>().CombinedGaleVector;
-        if (!shipIsRotating && galeDir.normalized != curHeading.normalized)
+        // Set heading to zero if there is no gale
+        if (galeDir == Vector3.zero)
+        {
+            curHeading = Vector3.zero;
+        }
+        // Set heading to match galeDir
+        else if(!shipIsRotating && galeDir.normalized != curHeading.normalized)
         {
             StartCoroutine(RotateShip(galeDir));
         }
@@ -41,11 +48,12 @@ public class TestShip : MonoBehaviour
         float headingDiff = Vector3.Angle(transform.forward, galeDir);
 
         // Construct start and end rotations
-        Quaternion endRotation = Quaternion.Euler(new Vector3(0, headingDiff, 0));
         Quaternion strtRotation = transform.rotation;
+        Vector3 endEulerRot = new Vector3(0, headingDiff, 0) + strtRotation.eulerAngles;
+        Quaternion endRotation = Quaternion.Euler(endEulerRot);
 
         // Calculate time it will take to rotate ship
-        float rotTime = headingDiff * turnRate;
+        float rotTime = headingDiff / turnRate;
 
         // Rotate ship to new rotation
         for (float curTime = 0; curTime < rotTime; curTime += Time.deltaTime)

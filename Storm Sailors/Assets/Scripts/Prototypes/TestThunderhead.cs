@@ -18,8 +18,7 @@ public class TestThunderhead : MonoBehaviour
     private void Awake()
     {
         // Initialize gale vector
-        //GameObject railCenter = GameObject.Find("Rail Center");
-        //galeVector = railCenter.transform.position - transform.position;
-        galeVector = transform.forward;
+        GameObject railCenter = GameObject.Find("Rail Center");
+        galeVector = railCenter.transform.position - transform.position;
     }
 }
