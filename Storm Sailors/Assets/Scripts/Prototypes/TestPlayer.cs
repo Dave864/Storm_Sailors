@@ -46,6 +46,12 @@ public class TestPlayer : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
+        // Quit qame
+        if (Input.GetButton("Cancel"))
+        {
+            Application.Quit();
+        }
+
         // Construct position vector from input
         float hInput = Input.GetAxisRaw("Horizontal");
         float vInput = Input.GetAxisRaw("Vertical");
@@ -98,16 +104,5 @@ public class TestPlayer : MonoBehaviour
         // Reset timer and state flags
         isPositioning = false;
         yield return null;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Hit");
-        // Go back to start if ship hit an obstacle
-        if (other.tag == "Obstacle")
-        {
-            cloudManager.GetComponent<TestCloudManager>().DispelAll();
-            transform.position = new Vector3(startArea.transform.position.x, transform.position.y, startArea.transform.position.z);
-        }
     }
 }

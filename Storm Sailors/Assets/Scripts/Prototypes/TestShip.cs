@@ -78,5 +78,10 @@ public class TestShip : MonoBehaviour
             GameObject startArea = GetComponentInParent<TestPlayer>().startArea;
             transform.parent.position = new Vector3(startArea.transform.position.x, transform.parent.position.y, startArea.transform.position.z);
         }
+        // Exit the game when finish line is reached
+        else if (obj.gameObject.CompareTag("Finish"))
+        {
+            Application.Quit();
+        }
     }
 }
