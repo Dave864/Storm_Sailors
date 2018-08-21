@@ -36,7 +36,7 @@ public class TestShip : MonoBehaviour
             CurHeading = Vector3.zero;
         }
         // Set heading to match galeDir
-        else if (!shipIsRotating && galeDir != CurHeading)
+        if (!shipIsRotating && galeDir != CurHeading)
         {
             StartCoroutine(RotateShip(galeDir));
         }
@@ -46,7 +46,7 @@ public class TestShip : MonoBehaviour
     {
         shipIsRotating = true;
         // Get angle between galeDir and ship's current heading
-        float headingDiff = Vector3.Angle(transform.forward, galeDir);
+        float headingDiff = Vector3.SignedAngle(transform.forward, galeDir, Vector3.up);
 
         // Construct start and end rotations
         Quaternion strtRotation = transform.rotation;
@@ -54,7 +54,7 @@ public class TestShip : MonoBehaviour
         Quaternion endRotation = Quaternion.Euler(endEulerRot);
 
         // Calculate time it will take to rotate ship
-        float rotTime = headingDiff / turnRate;
+        float rotTime = Mathf.Abs(headingDiff) / turnRate;
 
         // Rotate ship to new rotation
         for (float curTime = 0; curTime < rotTime; curTime += Time.deltaTime)
@@ -74,7 +74,7 @@ public class TestShip : MonoBehaviour
         // Go back to start if ship hit an obstacle
         if (obj.gameObject.CompareTag("Obstacle"))
         {
-            //cloudManager.GetComponent<TestCloudManager>().DispelAll();
+            cloudManager.GetComponent<TestCloudManager>().DispelAll();
             GameObject startArea = GetComponentInParent<TestPlayer>().startArea;
             transform.parent.position = new Vector3(startArea.transform.position.x, transform.parent.position.y, startArea.transform.position.z);
         }
