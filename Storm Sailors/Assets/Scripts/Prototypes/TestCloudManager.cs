@@ -15,6 +15,9 @@ public class TestCloudManager : MonoBehaviour {
     // Container for keeping track of spawned thunderheads
     private Dictionary<Vector2, GameObject> thunderheadPos = new Dictionary<Vector2, GameObject>();
 
+    // List of keys for thunderhead container
+    private List<Vector2> cardinalPos;
+
     // Reference to other game objects
     private GameObject railCenter;
     private GameObject wizard;
@@ -45,6 +48,9 @@ public class TestCloudManager : MonoBehaviour {
         thunderheadPos.Add(new Vector2(-1, -1), null);  // position SW
         thunderheadPos.Add(new Vector2(-1, 0), null);   // position W
         thunderheadPos.Add(new Vector2(-1, 1), null);   // position NW
+
+        // Initialize list of keys
+        cardinalPos = new List<Vector2>(thunderheadPos.Keys);
     }
 
     // Return whether a thunderhead is at pos
@@ -107,10 +113,12 @@ public class TestCloudManager : MonoBehaviour {
     public void DispelAll()
     {
         CombinedGaleVector = Vector3.zero;
-        foreach (KeyValuePair<Vector2, GameObject> cloud in thunderheadPos)
+        curCloudCnt = 0;
+        // Dispel all thunderclouds
+        for (int i = 0; i < cardinalPos.Count; i++)
         {
-            Destroy(thunderheadPos[cloud.Key]);
-            thunderheadPos[cloud.Key] = null;
+            Destroy(thunderheadPos[cardinalPos[i]]);
+            thunderheadPos[cardinalPos[i]] = null;
         }
     }
 }

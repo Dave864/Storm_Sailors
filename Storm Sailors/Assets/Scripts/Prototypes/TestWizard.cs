@@ -40,6 +40,12 @@ public class TestWizard : MonoBehaviour
     {
         PositionAction();
         SummonAction();
+
+        // Dispel all clouds
+        if (Input.GetButton("Dispel All"))
+        {
+            cloudManager.GetComponent<TestCloudManager>().DispelAll();
+        }
 	}
 
     // Move wizard to new position
