@@ -9,7 +9,7 @@ public class Wizard : MonoBehaviour
     private bool positioning = false;
 
     // Reference to game objects
-    private GameObject railCenter;
+    private GameObject compassCenter;
     private GameObject cloudManager;
 
     // Wizard movement variable
@@ -24,15 +24,18 @@ public class Wizard : MonoBehaviour
         cloudManager = GameObject.Find("Cloud Manager");
 
         // Position the wizard at the radius of the cloud rail
-        railCenter = GameObject.Find("Compass Center");
-        float zPos = railCenter.transform.position.z + railCenter.GetComponent<CompassCenter>().compassRadius;
-        float xPos = railCenter.transform.position.x;
-        float yPos = railCenter.transform.position.y;
+        compassCenter = GameObject.Find("Compass Center");
+        float zPos = compassCenter.transform.position.z + compassCenter.GetComponent<CompassCenter>().compassRadius;
+        float xPos = compassCenter.transform.position.x;
+        float yPos = compassCenter.transform.position.y;
         transform.position = new Vector3(xPos, yPos, zPos);
 
+        // Rotate wizard towards the center of the compass
+        transform.LookAt(compassCenter.transform, Vector3.forward);
+
         // Intialize curPos of wizard
-        curPos = railCenter.GetComponent<CompassCenter>().strtPos;
-        rotRate = railCenter.GetComponent<CompassCenter>().rotRate;
+        curPos = compassCenter.GetComponent<CompassCenter>().strtPos;
+        rotRate = compassCenter.GetComponent<CompassCenter>().rotRate;
     }
 
     // Update is called once per frame
@@ -100,16 +103,15 @@ public class Wizard : MonoBehaviour
     IEnumerator Position(Vector2 endPos)
     {
         // Set up the start and end rotations
-        float endAngle = railCenter.GetComponent<CompassCenter>().PositionAngle(endPos);
-        Quaternion strtRot = railCenter.transform.rotation;
-        Quaternion endRot = Quaternion.Euler(new Vector3(0, endAngle, 0));
+        Quaternion strtRot = compassCenter.GetComponent<CompassCenter>().PositionRot(curPos);
+        Quaternion endRot = compassCenter.GetComponent<CompassCenter>().PositionRot(endPos);
 
         for (float posTime = 0; posTime < rotRate; posTime += Time.deltaTime)
         {
             // Rotate the center of the rail to position the wizard
-            if (railCenter != null)
+            if (compassCenter != null)
             {
-                railCenter.transform.rotation = Quaternion.Slerp(strtRot, endRot, posTime / rotRate);
+                compassCenter.transform.rotation = Quaternion.Slerp(strtRot, endRot, posTime / rotRate);
             }
             yield return null;
         }

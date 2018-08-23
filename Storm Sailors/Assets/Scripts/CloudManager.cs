@@ -20,7 +20,7 @@ public class CloudManager : MonoBehaviour
     private List<Vector2> cardinalPos;
 
     // Reference to other game objects
-    private GameObject railCenter;
+    private GameObject compassCenter;
     private GameObject wizard;
 
     // Use this for initialization
@@ -37,7 +37,7 @@ public class CloudManager : MonoBehaviour
         CombinedGaleVector = new Vector3(0, 0, 0);
 
         // Establish reference to game objects
-        railCenter = GameObject.Find("Compass Center");
+        compassCenter = GameObject.Find("Compass Center");
         wizard = GameObject.Find("Wizard Object");
 
         // Initialize thunderheadPos
@@ -77,10 +77,12 @@ public class CloudManager : MonoBehaviour
 
                     // Instantiate thunderhead at position of wizard
                     GameObject newThunderhead = Instantiate(thunderheadPrefab, wizard.transform.position, Quaternion.identity, transform);
-                    newThunderhead.transform.position = new Vector3(wizard.transform.position.x, wizard.transform.position.y - dipVal, wizard.transform.position.z);
 
                     // Rotate thunderhead so it looks at the center of the cloud rail
-                    newThunderhead.transform.LookAt(railCenter.transform, Vector3.up);
+                    newThunderhead.transform.LookAt(compassCenter.transform, Vector3.up);
+
+                    // Lower the thunderhead by the dip value
+                    newThunderhead.transform.position = new Vector3(wizard.transform.position.x, wizard.transform.position.y - dipVal, wizard.transform.position.z);
 
                     // Add thunderhead to container
                     thunderheadPos[cardinalPos] = newThunderhead;

@@ -7,12 +7,12 @@ public enum POSITIONS
 {
     N = 1,
     S = 0,
-    E = 2,
-    W = 5,
-    NE = 4,
-    NW = 7,
-    SE = 3,
-    SW = 6
+    E = 5,
+    W = 2,
+    NE = 7,
+    NW = 4,
+    SE = 6,
+    SW = 3
 }
 
 [CustomEditor(typeof(CompassCenter))]
@@ -27,12 +27,12 @@ public class CompassCenterEditor : Editor
     private POSITIONS strtIndex;
     private readonly Vector2[] vectorPos = new Vector2[] {new Vector2(0, -1),   // S
                                                           new Vector2(0, 1),    // N
-                                                          new Vector2(-1, 0),   // E
-                                                          new Vector2(-1, -1),  // SE
-                                                          new Vector2(-1, 1),   // NE
-                                                          new Vector2(1, 0),    // W
-                                                          new Vector2(1, -1),   // SW
-                                                          new Vector2(1, 1)};   // NW
+                                                          new Vector2(-1, 0),   // W
+                                                          new Vector2(-1, -1),  // SW
+                                                          new Vector2(-1, 1),   // NW
+                                                          new Vector2(1, 0),    // E
+                                                          new Vector2(1, -1),   // SE
+                                                          new Vector2(1, 1)};   // NE
 
     protected virtual void OnEnable()
     {
@@ -45,14 +45,14 @@ public class CompassCenterEditor : Editor
         switch (Mathf.RoundToInt(s_strtPos.vector2Value.x))
         {
             case 1:
-                if (s_strtPos.vector2Value.y > 0) { strtIndex = POSITIONS.NW; }
-                else if (s_strtPos.vector2Value.y < 0) { strtIndex = POSITIONS.SW; }
-                else { strtIndex = POSITIONS.W; }
-                break;
-            case -1:
                 if (s_strtPos.vector2Value.y > 0) { strtIndex = POSITIONS.NE; }
                 else if (s_strtPos.vector2Value.y < 0) { strtIndex = POSITIONS.SE; }
                 else { strtIndex = POSITIONS.E; }
+                break;
+            case -1:
+                if (s_strtPos.vector2Value.y > 0) { strtIndex = POSITIONS.NW; }
+                else if (s_strtPos.vector2Value.y < 0) { strtIndex = POSITIONS.SW; }
+                else { strtIndex = POSITIONS.W; }
                 break;
             default:
                 if (s_strtPos.vector2Value.y > 0) { strtIndex = POSITIONS.N; }

@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     public Vector3 StartPos { get; set; }
 
     // References to components of player
-    private GameObject railCenter;
+    private GameObject compassCenter;
     private GameObject cloudManager;
     private GameObject wizard;
     private GameObject ship;
@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         // Establish the references to the components
-        railCenter = gameObject.transform.Find("Compass/Compass Center").gameObject;
+        compassCenter = gameObject.transform.Find("Compass/Compass Center").gameObject;
         wizard = gameObject.transform.Find("Compass/Compass Center/Wizard Object").gameObject;
         ship = gameObject.transform.Find("Ship Object").gameObject;
         cloudManager = gameObject.transform.Find("Compass/Cloud Manager").gameObject;
