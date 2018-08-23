@@ -5,8 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     // Start area reference
-    public GameObject startArea = null;
-    public Vector3 StartPos { get; set; }
+    public Vector3 startPos = new Vector3(0, 0, 0);
 
     // References to components of player
     private GameObject compassCenter;
@@ -18,7 +17,6 @@ public class Player : MonoBehaviour
     private readonly int defaultSpeed = 500;        // The default base speed of the ship
     private readonly float defaultRotRate = 0.1f;   // The default time it takes to change wizard position in sec
     private int baseSpeed;                          // The used base speed of the ship
-    private float rotRate;                          // The used time it takes to change wizard position in sec
 
     // Use this for initialization
     void Start()
@@ -30,11 +28,10 @@ public class Player : MonoBehaviour
         cloudManager = gameObject.transform.Find("Compass/Cloud Manager").gameObject;
 
         // Initialize the movement parameters
-        baseSpeed = (ship == null) ? defaultSpeed : ship.GetComponent<Ship>().baseSpeed;
+        baseSpeed = (ship == null) ? defaultSpeed : ship.GetComponent<ShipObject>().baseSpeed;
 
         // Set initial position of player
-        StartPos = (startArea == null) ? new Vector3(0, 0, 0) : startArea.transform.position;
-        transform.position = new Vector3(StartPos.x, transform.position.y, StartPos.z);
+        transform.position = new Vector3(startPos.x, transform.position.y, startPos.z);
     }
 
     // Update is called once per frame
@@ -47,6 +44,6 @@ public class Player : MonoBehaviour
         }
 
         // Move the player entity based off of the heading of the ship
-        transform.position += ship.GetComponent<Ship>().CurHeading * baseSpeed * Time.deltaTime;
+        transform.position += ship.GetComponent<ShipObject>().CurHeading * baseSpeed * Time.deltaTime;
     }
 }

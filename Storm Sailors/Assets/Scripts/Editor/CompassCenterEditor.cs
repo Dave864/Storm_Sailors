@@ -93,4 +93,21 @@ public class CompassCenterEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
     }
+
+    private void OnSceneGUI()
+    {
+        if (Event.current.type == EventType.Repaint)
+        {
+            // Create a circle with radius of the compass
+            Transform centerTransform = ((CompassCenter)target).transform;
+            Handles.CircleHandleCap
+                (
+                    0,
+                    centerTransform.position,
+                    centerTransform.rotation,
+                    s_radius.floatValue,
+                    EventType.repaint
+                );
+        }
+    }
 }
