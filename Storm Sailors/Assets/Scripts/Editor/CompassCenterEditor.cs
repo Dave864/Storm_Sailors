@@ -22,6 +22,7 @@ public class CompassCenterEditor : Editor
     SerializedProperty s_radius;
     SerializedProperty s_rotRate;
     SerializedProperty s_strtPos;
+    SerializedProperty s_stormPos;
 
     // Variables and constants for handling setting the start position
     private POSITIONS strtIndex;
@@ -43,6 +44,7 @@ public class CompassCenterEditor : Editor
         s_radius = serializedObject.FindProperty("compassRadius");
         s_rotRate = serializedObject.FindProperty("rotRate");
         s_strtPos = serializedObject.FindProperty("strtPos");
+        s_stormPos = serializedObject.FindProperty("stormPos");
 
         // Calculate the index of s_strtPos in vectorPos
         switch (Mathf.RoundToInt(s_strtPos.vector2Value.x))
@@ -104,6 +106,16 @@ public class CompassCenterEditor : Editor
             s_rotRate.floatValue = newRotRate;
         }
 
+        // Set wizard position for storm mode
+        EditorGUI.BeginChangeCheck();
+        float wizardHeight = EditorGUILayout.DelayedFloatField("Storm Mode Height", s_stormPos.vector3Value.y);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Vector3 newStormPos = ((CompassCenter)target).transform.position;
+            newStormPos.y = (wizardHeight < 0) ? 0 : wizardHeight + ((CompassCenter)target).transform.position.y;
+            s_stormPos.vector3Value = newStormPos;
+        }
+
         // Set up drop down menu for intial position
         EditorGUI.BeginChangeCheck();
         strtIndex = (POSITIONS)EditorGUILayout.EnumPopup("Wizard Start Position", strtIndex);
@@ -140,6 +152,7 @@ public class CompassCenterEditor : Editor
         // Draw markers to provide context for the different variables
         if (Event.current.type == EventType.Repaint)
         {
+            float markerSize = 0.4f;
             // Create a circle with radius of the compass
             Handles.CircleHandleCap
                 (
@@ -150,12 +163,16 @@ public class CompassCenterEditor : Editor
                     EventType.repaint
                 );
 
+            // Create marker to denote the position of the wizard in storm mode
+            Vector3 markerStormPos = s_stormPos.vector3Value;
+            Handles.CubeHandleCap(0, markerStormPos, Quaternion.identity, markerSize, EventType.Repaint);
+            Handles.Label(markerStormPos, "Wizard Storm\nPosition");
+
             // Create marker to denote the initial wizard starting position
             Vector3 compPos = compTransform.position;
-            Vector3 markerPos = cardinalRot[s_strtPos.vector2Value] * new Vector3(compPos.x, compPos.y, compPos.z + s_radius.floatValue);
-            //Handles.color = Color.yellow;
-            Handles.CubeHandleCap(0, markerPos, Quaternion.identity, 0.4f, EventType.Repaint);
-            Handles.Label(markerPos, "Wizard Start\nPosition");
+            Vector3 markerInitPos = cardinalRot[s_strtPos.vector2Value] * new Vector3(compPos.x, compPos.y, compPos.z + s_radius.floatValue);
+            Handles.CubeHandleCap(1, markerInitPos, Quaternion.identity, markerSize, EventType.Repaint);
+            Handles.Label(markerInitPos, "Wizard Start\nPosition");
         }
     }
 }
