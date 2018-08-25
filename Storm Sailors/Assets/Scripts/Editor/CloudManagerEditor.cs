@@ -82,7 +82,7 @@ public class CloudManagerEditor : Editor
 
             // Create marker for point on compass at dip value
             Handles.CubeHandleCap(1, dipCompassPos, Quaternion.identity, cubeSize, EventType.Repaint);
-            Handles.Label(dipCompassPos, "Cloud Spawn\nPosition");
+            Handles.Label(dipCompassPos, "Cloud Spawn\nDip");
 
             // Draw a line between the two points
             Handles.DrawLine(onCompassPos, dipCompassPos);

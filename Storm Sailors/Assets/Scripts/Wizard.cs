@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+enum Mode { WIND, STORM }
+
 public class Wizard : MonoBehaviour
 {
     // State variables to manage input events
-    private bool spawnPressed = false;
     private bool positioning = false;
+    private Mode curMode = Mode.WIND;
 
     // Reference to game objects
     private GameObject compassCenter;
@@ -51,17 +53,67 @@ public class Wizard : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        PositionAction();
-        SummonAction();
-
-        // Dispel all clouds
-        if (Input.GetButton("Dispel All"))
+        bool changeMode = Input.GetButtonDown("Change Mode");
+        switch (curMode)
         {
-            cloudManager.GetComponent<CloudManager>().DispelAll();
+            case Mode.WIND:
+                // Change mode
+                if (changeMode)
+                {
+                    ShiftMode();
+                }
+                // Handle wind mode actions
+                else
+                {
+                    PositionAction();
+                    SummonAction();
+
+                    // Dispel all clouds
+                    if (Input.GetButton("Dispel All"))
+                    {
+                        cloudManager.GetComponent<CloudManager>().DispelAll();
+                    }
+                }
+                break;
+
+            case Mode.STORM:
+                // Change mode
+                if (changeMode)
+                {
+                    ShiftMode();
+                }
+                // Handle storm mode actions
+                else
+                {
+
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
-    // Move wizard to new position
+    // Shift wizard between various modes
+    private void ShiftMode()
+    {
+        switch (curMode)
+        {
+            case Mode.WIND:
+                if (!positioning)
+                {
+                    curMode = Mode.STORM;
+                }
+                break;
+            case Mode.STORM:
+                curMode = Mode.WIND;
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Move wizard to new compass position
     private void PositionAction()
     {
         // Construct position vector from input
@@ -86,26 +138,18 @@ public class Wizard : MonoBehaviour
     // Summon or dispel cloud at wizard position
     private void SummonAction()
     {
-        if (Input.GetButton("Summon") && !positioning)
+        if (Input.GetButtonDown("Summon") && !positioning)
         {
-            if (!spawnPressed)
+            // Dispel cloud at position
+            if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curPos))
             {
-                spawnPressed = true;
-                // Dispel cloud at position
-                if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curPos))
-                {
-                    cloudManager.GetComponent<CloudManager>().DispelThunderhead(curPos);
-                }
-                // Summon a cloud at position
-                else
-                {
-                    cloudManager.GetComponent<CloudManager>().SpawnThunderhead(curPos);
-                }
+                cloudManager.GetComponent<CloudManager>().DispelThunderhead(curPos);
             }
-        }
-        else
-        {
-            spawnPressed = false;
+            // Summon a cloud at position
+            else
+            {
+                cloudManager.GetComponent<CloudManager>().SpawnThunderhead(curPos);
+            }
         }
     }
 

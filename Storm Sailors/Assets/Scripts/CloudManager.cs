@@ -7,7 +7,7 @@ public class CloudManager : MonoBehaviour
     // Variables for managing spawned clouds
     public int maxCloudCnt = 3;
     private int curCloudCnt = 0;
-    public float dipVal = 0.5f; // TODO: put a limit on how big this can be in editor (after jam)
+    public float dipVal = 0.5f;
     public GameObject thunderheadPrefab;
 
     // Vector resulting from combined gale vectors of thunderheads

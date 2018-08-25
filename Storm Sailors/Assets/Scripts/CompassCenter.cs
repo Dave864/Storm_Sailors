@@ -7,6 +7,7 @@ public class CompassCenter : MonoBehaviour
     public float compassRadius = 2;                 // Adjustable radius of cloud rail; to be matched with the cloud rail sprite
     public float rotRate = 0.1f;                    // The time in sec of each rotation about the center
     public Vector2 strtPos = new Vector2(0, 1);     // Intial orientation of the center of the cloud rail
+    public Vector3 stormPos = new Vector3(0, 0, 0); // Position wizard takes when in storm mode
 
     // Holds rotations corresponding to the positions that the wizard can be at on the cloud rail
     private Dictionary<Vector2, Quaternion> cardinalRot = new Dictionary<Vector2, Quaternion>();

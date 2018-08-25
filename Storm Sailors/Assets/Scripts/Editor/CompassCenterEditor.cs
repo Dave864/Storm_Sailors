@@ -155,7 +155,7 @@ public class CompassCenterEditor : Editor
             Vector3 markerPos = cardinalRot[s_strtPos.vector2Value] * new Vector3(compPos.x, compPos.y, compPos.z + s_radius.floatValue);
             //Handles.color = Color.yellow;
             Handles.CubeHandleCap(0, markerPos, Quaternion.identity, 0.4f, EventType.Repaint);
-            Handles.Label(markerPos, "Wizard Start\nDip");
+            Handles.Label(markerPos, "Wizard Start\nPosition");
         }
     }
 }
