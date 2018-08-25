@@ -23,7 +23,12 @@ public class CompassCenter : MonoBehaviour
         cardinalRot.Add(new Vector2(-1, 1), transform.rotation);    // position NW
 
         List<Vector2> cardRotIndex = new List<Vector2>(cardinalRot.Keys);
-        Vector3 playerEulerRot = GameObject.Find("Player").transform.rotation.eulerAngles;
+        GameObject playerObject = GameObject.Find("Player");
+        if (playerObject == null)
+        {
+            Debug.LogError("Player object not found", playerObject);
+        }
+        Vector3 playerEulerRot = playerObject.transform.rotation.eulerAngles;
 
         for (int i = 0; i < cardRotIndex.Count; i++)
         {

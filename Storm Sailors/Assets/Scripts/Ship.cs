@@ -18,7 +18,16 @@ public class Ship : MonoBehaviour
     {
         turnRate = 180.0f / uTurnTime;
         cloudManager = GameObject.Find("Cloud Manager");
+        if (cloudManager == null)
+        {
+            Debug.LogError("Cloud Manager object not found", cloudManager);
+        }
+
         shipObject = GameObject.Find("Ship Object");
+        if (shipObject == null)
+        {
+            Debug.LogError("Ship Object object not found", shipObject);
+        }
 	}
 
     private void OnTriggerEnter(Collider obj)

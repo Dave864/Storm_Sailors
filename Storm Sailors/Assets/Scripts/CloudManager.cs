@@ -36,9 +36,19 @@ public class CloudManager : MonoBehaviour
         // Initialize combined gale vector
         CombinedGaleVector = new Vector3(0, 0, 0);
 
-        // Establish reference to game objects
+        // Establish reference to compass center
         compassCenter = GameObject.Find("Compass Center");
+        if (compassCenter == null)
+        {
+            Debug.LogError("Compass Center object not found", compassCenter);
+        }
+
+        // Establish reference to wizard
         wizard = GameObject.Find("Wizard Object");
+        if (wizard == null)
+        {
+            Debug.LogError("Wizard Object object not found", wizard);
+        }
 
         // Initialize thunderheadPos
         thunderheadPos.Add(new Vector2(0, 1), null);    // position N

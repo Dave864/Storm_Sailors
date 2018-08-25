@@ -27,7 +27,17 @@ public class ShipObject : MonoBehaviour
             baseSpeed = selectedShip.GetComponent<Ship>().baseSpeed;
             turnRate = selectedShip.GetComponent<Ship>().turnRate;
         }
+        else
+        {
+            Debug.LogError("No ship selected for ShipObject", selectedShip);
+        }
+
         cloudManager = GameObject.Find("Cloud Manager");
+        if(cloudManager == null)
+        {
+            Debug.LogError("Cloud Manager object not found", cloudManager);
+        }
+
         CurHeading = transform.forward.normalized;
     }
 

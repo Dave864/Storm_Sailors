@@ -22,9 +22,19 @@ public class Wizard : MonoBehaviour
     {
         // Get reference to cloud manager
         cloudManager = GameObject.Find("Cloud Manager");
+        if (cloudManager == null)
+        {
+            Debug.LogError("Cloud Manager object not found", cloudManager);
+        }
+
+        // Get reference to compass center
+        compassCenter = GameObject.Find("Compass Center");
+        if (compassCenter == null)
+        {
+            Debug.LogError("Compass Center object not found", compassCenter);
+        }
 
         // Position the wizard at the radius of the cloud rail
-        compassCenter = GameObject.Find("Compass Center");
         float zPos = compassCenter.transform.position.z + compassCenter.GetComponent<CompassCenter>().compassRadius;
         float xPos = compassCenter.transform.position.x;
         float yPos = compassCenter.transform.position.y;

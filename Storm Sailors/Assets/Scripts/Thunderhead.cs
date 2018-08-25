@@ -18,7 +18,12 @@ public class Thunderhead : MonoBehaviour
     private void Awake()
     {
         // Initialize gale vector
-        GameObject railCenter = GameObject.Find("Compass Center");
-        galeVector = railCenter.transform.position - transform.position;
+        GameObject compassCenter = GameObject.Find("Compass Center");
+        if (compassCenter == null)
+        {
+            Debug.LogError("Compass Center object not found", compassCenter);
+        }
+
+        galeVector = compassCenter.transform.position - transform.position;
     }
 }

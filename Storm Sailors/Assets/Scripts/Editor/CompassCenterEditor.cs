@@ -34,6 +34,9 @@ public class CompassCenterEditor : Editor
                                                           new Vector2(1, -1),   // SE
                                                           new Vector2(1, 1)};   // NE
 
+    // Holds the positions that the wizard can be at on the cloud rail
+    private Dictionary<Vector2, Quaternion> cardinalRot = new Dictionary<Vector2, Quaternion>();
+
     protected virtual void OnEnable()
     {
         // Get the current properties of the values
@@ -58,6 +61,24 @@ public class CompassCenterEditor : Editor
                 if (s_strtPos.vector2Value.y > 0) { strtIndex = POSITIONS.N; }
                 else { strtIndex = POSITIONS.S; }
                 break;
+        }
+
+        // Initialize the dictionary of cardinal position rotations
+        cardinalRot.Add(new Vector2(0, 1), Quaternion.identity);     // position N
+        cardinalRot.Add(new Vector2(1, 1), Quaternion.identity);     // position NE
+        cardinalRot.Add(new Vector2(1, 0), Quaternion.identity);     // position E
+        cardinalRot.Add(new Vector2(1, -1), Quaternion.identity);    // position SE
+        cardinalRot.Add(new Vector2(0, -1), Quaternion.identity);    // position S
+        cardinalRot.Add(new Vector2(-1, -1), Quaternion.identity);   // position SW
+        cardinalRot.Add(new Vector2(-1, 0), Quaternion.identity);    // position W
+        cardinalRot.Add(new Vector2(-1, 1), Quaternion.identity);    // position NW
+
+        List<Vector2> cardRotIndex = new List<Vector2>(cardinalRot.Keys);
+        Vector3 compCntr = ((CompassCenter)target).transform.position;
+
+        for (int i = 0; i < cardRotIndex.Count; i++)
+        {
+            cardinalRot[cardRotIndex[i]] = Quaternion.AngleAxis(45f * i, Vector3.up);
         }
     }
 
@@ -96,18 +117,45 @@ public class CompassCenterEditor : Editor
 
     private void OnSceneGUI()
     {
+        Transform compTransform = ((CompassCenter)target).transform;
+
+        // Create handle to adust the compass radius
+        serializedObject.Update();
+        EditorGUI.BeginChangeCheck();
+        float newRadius = Handles.ScaleSlider
+            (
+                s_radius.floatValue, 
+                compTransform.position, 
+                -compTransform.up, 
+                Quaternion.identity,
+                HandleUtility.GetHandleSize(compTransform.position),
+                0.1f
+            );
+        if(EditorGUI.EndChangeCheck())
+        {
+            s_radius.floatValue = (newRadius < 0) ? 0 : newRadius;
+        }
+        serializedObject.ApplyModifiedProperties();
+
+        // Draw markers to provide context for the different variables
         if (Event.current.type == EventType.Repaint)
         {
             // Create a circle with radius of the compass
-            Transform centerTransform = ((CompassCenter)target).transform;
             Handles.CircleHandleCap
                 (
                     0,
-                    centerTransform.position,
-                    centerTransform.rotation,
+                    compTransform.position,
+                    compTransform.rotation,
                     s_radius.floatValue,
                     EventType.repaint
                 );
+
+            // Create marker to denote the initial wizard starting position
+            Vector3 compPos = compTransform.position;
+            Vector3 markerPos = cardinalRot[s_strtPos.vector2Value] * new Vector3(compPos.x, compPos.y, compPos.z + s_radius.floatValue);
+            //Handles.color = Color.yellow;
+            Handles.CubeHandleCap(0, markerPos, Quaternion.identity, 0.4f, EventType.Repaint);
+            Handles.Label(markerPos, "Wizard Start\nDip");
         }
     }
 }

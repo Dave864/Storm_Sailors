@@ -14,6 +14,11 @@ public class PlayerEditor : Editor
         s_strtPos = serializedObject.FindProperty("startPos");
     }
 
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+    }
+
     private void OnSceneGUI()
     {
         serializedObject.Update();

@@ -21,11 +21,33 @@ public class Player : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Establish the references to the components
+        // Establish reference to compass center
         compassCenter = gameObject.transform.Find("Compass/Compass Center").gameObject;
+        if (compassCenter == null)
+        {
+            Debug.LogError("Compass Center object not found", compassCenter);
+        }
+
+        // Establish reference to wizard
         wizard = gameObject.transform.Find("Compass/Compass Center/Wizard Object").gameObject;
+        if (wizard == null)
+        {
+            Debug.LogError("Wizard object not found", wizard);
+        }
+
+        // Establish reference to ship
         ship = gameObject.transform.Find("Ship Object").gameObject;
+        if (ship == null)
+        {
+            Debug.LogError("Ship object not found", ship);
+        }
+
+        // Establish reference to cloud manager
         cloudManager = gameObject.transform.Find("Compass/Cloud Manager").gameObject;
+        if (cloudManager == null)
+        {
+            Debug.LogError("Cloud Manager object not found", cloudManager);
+        }
 
         // Initialize the movement parameters
         baseSpeed = (ship == null) ? defaultSpeed : ship.GetComponent<ShipObject>().baseSpeed;
