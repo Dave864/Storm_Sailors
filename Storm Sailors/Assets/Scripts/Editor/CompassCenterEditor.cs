@@ -21,10 +21,12 @@ public class CompassCenterEditor : Editor
     // Properties to change
     SerializedProperty s_radius;
     SerializedProperty s_rotRate;
+    SerializedProperty s_shiftRate;
     SerializedProperty s_strtPos;
-    SerializedProperty s_stormPos;
+    SerializedProperty s_stormHeight;
 
     // Variables and constants for handling setting the start position
+    private GameObject playerObj;
     private POSITIONS strtIndex;
     private readonly Vector2[] vectorPos = new Vector2[] {new Vector2(0, -1),   // S
                                                           new Vector2(0, 1),    // N
@@ -43,8 +45,16 @@ public class CompassCenterEditor : Editor
         // Get the current properties of the values
         s_radius = serializedObject.FindProperty("compassRadius");
         s_rotRate = serializedObject.FindProperty("rotRate");
+        s_shiftRate = serializedObject.FindProperty("shiftRate");
         s_strtPos = serializedObject.FindProperty("strtPos");
-        s_stormPos = serializedObject.FindProperty("stormPos");
+        s_stormHeight = serializedObject.FindProperty("stormHeight");
+
+        // Get reference for player object
+        playerObj = GameObject.Find("Player");
+        if (playerObj == null)
+        {
+            Debug.LogError("Player object not found in hierarchy");
+        }
 
         // Calculate the index of s_strtPos in vectorPos
         switch (Mathf.RoundToInt(s_strtPos.vector2Value.x))
@@ -88,6 +98,9 @@ public class CompassCenterEditor : Editor
     {
         serializedObject.Update();
 
+        EditorGUILayout.BeginVertical("Box");
+        EditorGUILayout.LabelField("Compass Settings");
+
         // Set radius of compass, with minimum bound
         EditorGUI.BeginChangeCheck();
         float newRadius = EditorGUILayout.DelayedFloatField("Compass Radius", s_radius.floatValue);
@@ -100,20 +113,34 @@ public class CompassCenterEditor : Editor
         // Set rotation rate of compass center, with minimum bound
         EditorGUI.BeginChangeCheck();
         float newRotRate = EditorGUILayout.DelayedFloatField("Rotation Time (sec)", s_rotRate.floatValue);
-        newRotRate = (newRotRate < 0) ? 0.0f : newRotRate;
+        newRotRate = (newRotRate < 0) ? 0 : newRotRate;
         if (EditorGUI.EndChangeCheck())
         {
             s_rotRate.floatValue = newRotRate;
         }
 
+        EditorGUILayout.EndVertical();
+        EditorGUILayout.BeginVertical("Box");
+        EditorGUILayout.LabelField("Wizard Settings");
+
         // Set wizard position for storm mode
         EditorGUI.BeginChangeCheck();
-        float wizardHeight = EditorGUILayout.DelayedFloatField("Storm Mode Height", s_stormPos.vector3Value.y);
+        float wizardHeight = EditorGUILayout.DelayedFloatField("Storm Mode Height", s_stormHeight.floatValue);
+        wizardHeight += playerObj.transform.position.y;
         if (EditorGUI.EndChangeCheck())
         {
             Vector3 newStormPos = ((CompassCenter)target).transform.position;
-            newStormPos.y = (wizardHeight < 0) ? 0 : wizardHeight + ((CompassCenter)target).transform.position.y;
-            s_stormPos.vector3Value = newStormPos;
+            newStormPos.y = (wizardHeight < 0) ? playerObj.transform.position.y : wizardHeight;
+            s_stormHeight.floatValue = newStormPos.y;
+        }
+
+        // Set shift rate for wizard, with minimum bound
+        EditorGUI.BeginChangeCheck();
+        float newShiftRate = EditorGUILayout.DelayedFloatField("Mode shift rate (sec)", s_shiftRate.floatValue);
+        newShiftRate = (newShiftRate < 0) ? 0 : newShiftRate;
+        if (EditorGUI.EndChangeCheck())
+        {
+            s_shiftRate.floatValue = newShiftRate;
         }
 
         // Set up drop down menu for intial position
@@ -124,6 +151,7 @@ public class CompassCenterEditor : Editor
             s_strtPos.vector2Value = vectorPos[(int)strtIndex];
         }
 
+        EditorGUILayout.EndVertical();
         serializedObject.ApplyModifiedProperties();
     }
 
@@ -164,7 +192,8 @@ public class CompassCenterEditor : Editor
                 );
 
             // Create marker to denote the position of the wizard in storm mode
-            Vector3 markerStormPos = s_stormPos.vector3Value;
+            Vector3 markerStormPos = ((CompassCenter)target).transform.position;
+            markerStormPos.y = s_stormHeight.floatValue;
             Handles.CubeHandleCap(0, markerStormPos, Quaternion.identity, markerSize, EventType.Repaint);
             Handles.Label(markerStormPos, "Wizard Storm\nPosition");
 
