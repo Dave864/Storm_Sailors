@@ -27,11 +27,10 @@ public class CloudManager : MonoBehaviour
     void Start()
     {
         // Keep the cloud max count from exceeding the number of positions
-        // TODO: placeholder until editor scripts are made (after jam)
-        if (maxCloudCnt > 8)
+        /*if (maxCloudCnt > 8)
         {
             maxCloudCnt = 8;
-        }
+        }*/
 
         // Initialize combined gale vector
         CombinedGaleVector = new Vector3(0, 0, 0);

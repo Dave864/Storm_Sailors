@@ -14,11 +14,11 @@ public class Wizard : MonoBehaviour
     // Reference to game objects
     private GameObject compassCenter;
     private GameObject cloudManager;
+    private GameObject shipObject;
 
     // Wizard movement variables
     private Vector2 curCompassPos = new Vector2(0, 0);
     private Vector2 destinationCompassPos = new Vector2(0, 0);
-    private Quaternion wizardCompassRot = new Quaternion();
     private float rotRate;
     private float shiftRate;
 
@@ -39,11 +39,15 @@ public class Wizard : MonoBehaviour
             Debug.LogError("Compass Center object not found", compassCenter);
         }
 
+        // Get reference to ship object
+        shipObject = GameObject.Find("Ship Object");
+        if (shipObject == null)
+        {
+            Debug.LogError("Ship Object object not found", shipObject);
+        }
+
         // Position the wizard at the radius of the cloud rail
-        float zPos = compassCenter.transform.position.z + compassCenter.GetComponent<CompassCenter>().compassRadius;
-        float xPos = compassCenter.transform.position.x;
-        float yPos = compassCenter.transform.position.y;
-        transform.position = new Vector3(xPos, yPos, zPos);
+        transform.localPosition = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
 
         // Rotate wizard towards the center of the compass
         transform.LookAt(compassCenter.transform, Vector3.forward);
@@ -103,30 +107,31 @@ public class Wizard : MonoBehaviour
     {
         shifting = true;
         float shiftRate = compassCenter.GetComponent<CompassCenter>().shiftRate;
-        Quaternion stormPos;
+        Vector3 stormPos;
+        Vector3 windPos;
         Quaternion stormRot;
-        Quaternion windPos;
+        Quaternion windRot;
         switch (curMode)
         {
             case Mode.WIND:
                 // Don't shift modes if wizard is changing compass position
                 if (!positioning)
                 {
+                    // Calculate the start and end positions of the mode shift
+                    stormPos = new Vector3(0, 0, compassCenter.transform.position.y - compassCenter.GetComponent<CompassCenter>().stormHeight);
+                    windPos = transform.localPosition;
+                    stormRot = Quaternion.LookRotation(shipObject.GetComponent<ShipObject>().CurHeading);
+                    windRot = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
+
                     // Move wizard to storm mode position
-                    stormPos = Quaternion.LookRotation(compassCenter.transform.up, Vector3.up);
-                    windPos = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
-                    stormRot = Quaternion.Euler(180f, 0, 0);
-                    wizardCompassRot = transform.rotation;
                     for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
                     {
-                        compassCenter.transform.rotation = Quaternion.Slerp(windPos, stormPos, shiftTime / shiftRate);
-                        transform.rotation = Quaternion.Slerp(wizardCompassRot, stormRot, shiftTime / shiftRate);
+                        transform.localPosition = Vector3.Slerp(windPos, stormPos, shiftTime / shiftRate);
+                        //compassCenter.transform.rotation = Quaternion.Lerp(windRot, stormRot, shiftTime / shiftRate);
                         yield return null;
                     }
-
-                    // Finalize move to account for loop not quite moving the wizard fully
-                    compassCenter.transform.rotation = stormPos;
-                    transform.rotation = stormRot;
+                    transform.localPosition = stormPos;
+                    //compassCenter.transform.rotation = stormRot;
                     curMode = Mode.STORM;
                 }
                 shifting = false;
@@ -134,20 +139,21 @@ public class Wizard : MonoBehaviour
                 break;
             
             case Mode.STORM:
+                // Calculate the start and end positions of the mode shift
+                stormPos = transform.localPosition;
+                windPos = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
+                stormRot = compassCenter.transform.rotation;
+                windRot = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
+
                 // Move wizard to wind mode position
-                stormPos = compassCenter.transform.rotation;
-                windPos = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
-                stormRot = transform.rotation;
                 for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
                 {
-                    compassCenter.transform.rotation = Quaternion.Slerp(stormPos, windPos, shiftTime / shiftRate);
-                    transform.rotation = Quaternion.Slerp(stormRot, wizardCompassRot, shiftTime / shiftRate);
+                    transform.localPosition = Vector3.Slerp(stormPos, windPos, shiftTime / shiftRate);
+                    //compassCenter.transform.rotation = Quaternion.Lerp(stormRot, windRot, shiftTime / shiftRate);
                     yield return null;
                 }
-
-                // Finalize move to account for loop not quite moving the wizard fully
-                compassCenter.transform.rotation = windPos;
-                transform.rotation = wizardCompassRot;
+                transform.localPosition = windPos;
+                //compassCenter.transform.rotation = windRot;
                 curMode = Mode.WIND;
                 shifting = false;
                 yield return null;
