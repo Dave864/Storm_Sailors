@@ -13,10 +13,11 @@ public class CloudManager : MonoBehaviour
     // Vector resulting from combined gale vectors of thunderheads
     [HideInInspector] public Vector3 CombinedGaleVector { get; set; }
 
-    // Container for keeping track of spawned thunderheads
+    // Containers for keeping track of spawned thunderheads
     private Dictionary<Vector2, GameObject> thunderheadPos = new Dictionary<Vector2, GameObject>();
+    private GameObject stormCloudRef;
 
-    // List of keys for thunderhead container
+    // List of keys for thunderheadPos container
     private List<Vector2> cardinalPos;
 
     // Reference to other game objects
@@ -26,12 +27,6 @@ public class CloudManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Keep the cloud max count from exceeding the number of positions
-        /*if (maxCloudCnt > 8)
-        {
-            maxCloudCnt = 8;
-        }*/
-
         // Initialize combined gale vector
         CombinedGaleVector = new Vector3(0, 0, 0);
 
@@ -61,6 +56,9 @@ public class CloudManager : MonoBehaviour
 
         // Initialize list of keys
         cardinalPos = new List<Vector2>(thunderheadPos.Keys);
+
+        // Initialize the storm cloud reference
+        stormCloudRef = null;
     }
 
     // Return whether a thunderhead is at pos
@@ -73,25 +71,25 @@ public class CloudManager : MonoBehaviour
         return false;
     }
 
-    // Summon a new thunderhead at pos
-    public void SpawnThunderhead(Vector2 cardinalPos)
+    // Summon a new thunderhead
+    public void SpawnThunderhead(Vector2 cardinalPos = default(Vector2))
     {
-        if (curCloudCnt < maxCloudCnt)
+        Vector3 wizardPos = wizard.transform.position;
+        GameObject newThunderhead;
+        switch (wizard.GetComponent<Wizard>().CurMode)
         {
-            if (thunderheadPos.ContainsKey(cardinalPos))
-            {
-                if (thunderheadPos[cardinalPos] == null)
+            // Gale mode
+            case 0:
+                if (curCloudCnt < maxCloudCnt && thunderheadPos.ContainsKey(cardinalPos) && thunderheadPos[cardinalPos] == null)
                 {
-                    Vector3 wizardPos = wizard.transform.position;
-
-                    // Instantiate thunderhead at position of wizard
-                    GameObject newThunderhead = Instantiate(thunderheadPrefab, wizard.transform.position, Quaternion.identity, transform);
+                    // Instantiate gale thunderhead at position of wizard
+                    newThunderhead = Instantiate(thunderheadPrefab, wizardPos, Quaternion.identity, transform);
 
                     // Rotate thunderhead so it looks at the center of the cloud rail
                     newThunderhead.transform.LookAt(compassCenter.transform, Vector3.up);
 
                     // Lower the thunderhead by the dip value
-                    newThunderhead.transform.position = new Vector3(wizard.transform.position.x, wizard.transform.position.y - dipVal, wizard.transform.position.z);
+                    newThunderhead.transform.position = new Vector3(wizardPos.x, wizardPos.y - dipVal, wizardPos.z);
 
                     // Add thunderhead to container
                     thunderheadPos[cardinalPos] = newThunderhead;
@@ -100,24 +98,45 @@ public class CloudManager : MonoBehaviour
                     // Update combined gale vector
                     CombinedGaleVector += newThunderhead.GetComponent<Thunderhead>().GaleVector;
                 }
-            }
+                break;
+
+            // Storm mode
+            case 1:
+                // Instantiate storm thunderhead at position of wizard
+                stormCloudRef = Instantiate(thunderheadPrefab, wizardPos, Quaternion.identity, transform);
+                break;
+
+            default:
+                break;
         }
     }
 
-    // Dispel a thunderhead at pos
-    public void DispelThunderhead(Vector2 cardinalPos)
+    // Dispel a thunderhead
+    public void DispelThunderhead(Vector2 cardinalPos = default(Vector2))
     {
-        if (curCloudCnt > 0)
+        switch (wizard.GetComponent<Wizard>().CurMode)
         {
-            if (thunderheadPos.ContainsKey(cardinalPos))
-            {
-                // Update combined gale vector
-                CombinedGaleVector -= thunderheadPos[cardinalPos].GetComponent<Thunderhead>().GaleVector;
-                // Dispel thunderhead
-                Destroy(thunderheadPos[cardinalPos]);
-                thunderheadPos[cardinalPos] = null;
-                curCloudCnt--;
-            }
+            // Gale mode
+            case 0:
+                if (curCloudCnt > 0 && thunderheadPos.ContainsKey(cardinalPos))
+                {
+                    // Update combined gale vector
+                    CombinedGaleVector -= thunderheadPos[cardinalPos].GetComponent<Thunderhead>().GaleVector;
+                    // Dispel thunderhead
+                    Destroy(thunderheadPos[cardinalPos]);
+                    thunderheadPos[cardinalPos] = null;
+                    curCloudCnt--;
+                }
+                break;
+
+            // Storm mode
+            case 1:
+                // Dispel storm thunderhead
+                Destroy(stormCloudRef);
+                break;
+
+            default:
+                break;
         }
     }
 

@@ -95,6 +95,7 @@ public class Wizard : MonoBehaviour
         Quaternion stormRot;
         switch (curMode)
         {
+            // Shift from gale mode to storm mode
             case Mode.GALE:
                 // Don't shift modes if wizard is changing compass position
                 if (!GetComponent<GaleMode>().Positioning)
@@ -115,18 +116,25 @@ public class Wizard : MonoBehaviour
                     transform.localPosition = stormPos;
                     transform.rotation = stormRot;
                     curMode = Mode.STORM;
+
+                    // Spawn storm thunderhead (TEMPORARY)
+                    cloudManager.GetComponent<CloudManager>().SpawnThunderhead();
                 }
                 shifting = false;
                 yield return null;
                 break;
             
+            // Shift from storm mode to gale mode
             case Mode.STORM:
+                // Dispel storm thunderhead (TEMPORARY?)
+                cloudManager.GetComponent<CloudManager>().DispelThunderhead();
+
                 // Calculate the start and end positions of the mode shift
                 stormPos = transform.localPosition;
                 windPos = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
                 stormRot = transform.rotation;
 
-                // Move wizard to wind mode position
+                // Move wizard to gale mode position
                 for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
                 {
                     transform.localPosition = Vector3.Slerp(stormPos, windPos, shiftTime / shiftRate);

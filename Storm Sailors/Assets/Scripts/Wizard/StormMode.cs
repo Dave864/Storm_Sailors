@@ -42,30 +42,38 @@ public class StormMode : MonoBehaviour
     {
         if (GetComponent<Wizard>().CurMode == StormModeVal)
         {
-            // Face the wizard in the direction of the mouse
-            if (Input.mousePresent)
+            // Execute various Storm mode actions
+            WizardFaceMouse();
+            // TODO: Charge thunderhead
+            // TODO: Gather thunderheads
+            // TODO: Launch thunderhead
+        }
+    }
+
+    // Rotate the wizard to face the position of the mouse
+    void WizardFaceMouse ()
+    {
+        if (Input.mousePresent)
+        {
+            // Translate the mouse position to in game world position
+            Vector2 mousePos = Input.mousePosition;
+            Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, Camera.main.nearClipPlane));
+
+            // Raycast the mouse position find the apparent mouse position on the sea
+            Vector3 mouseSeaPosition = new Vector3();
+            RaycastHit mouseRayHit;
+            if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit))
             {
-                // Translate the mouse position to in game world position
-                Vector2 mousePos = Input.mousePosition;
-                Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, Camera.main.nearClipPlane));
-
-                // Raycast the mouse position find the apparent mouse position on the sea
-                Vector3 mouseSeaPosition = new Vector3();
-                RaycastHit mouseRayHit;
-                if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit))
-                {
-                    mouseSeaPosition = new Vector3(mouseRayHit.point.x, transform.position.y, mouseRayHit.point.z);
-                }
-                else
-                {
-                    mouseSeaPosition = mouseWorldPosition;
-                }
-
-                // Rotate the wizard in the direction of the mouse point on the sea
-                Vector3 direction = mouseSeaPosition - transform.position;
-                transform.forward = direction;
+                mouseSeaPosition = new Vector3(mouseRayHit.point.x, transform.position.y, mouseRayHit.point.z);
             }
-            // Do other stuff
+            else
+            {
+                mouseSeaPosition = mouseWorldPosition;
+            }
+
+            // Rotate the wizard in the direction of the mouse point on the sea
+            Vector3 direction = mouseSeaPosition - transform.position;
+            transform.forward = direction;
         }
     }
 }

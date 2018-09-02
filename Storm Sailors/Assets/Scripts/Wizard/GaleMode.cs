@@ -60,9 +60,10 @@ public class GaleMode : MonoBehaviour
     {
         if (GetComponent<Wizard>().CurMode == GaleModeVal)
         {
-            // Execute Gale mode actions
+            // Execute various Gale mode actions
             PositionAction();
             SummonAction();
+            // TODO: charge cloud
 
             // Dispel all clouds
             if (Input.GetButton("Dispel All"))
