@@ -18,6 +18,7 @@ public class Wizard : MonoBehaviour
 
     // Wizard movement variables
     private Vector2 curCompassPos = new Vector2(0, 0);
+    private Quaternion curCompassRot = new Quaternion();
     private Vector2 destinationCompassPos = new Vector2(0, 0);
     private float rotRate;
     private float shiftRate;
@@ -50,10 +51,11 @@ public class Wizard : MonoBehaviour
         transform.localPosition = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
 
         // Rotate wizard towards the center of the compass
-        transform.LookAt(compassCenter.transform, Vector3.forward);
+        transform.LookAt(compassCenter.transform);
 
         // Intialize curPos of wizard
         curCompassPos = compassCenter.GetComponent<CompassCenter>().strtPos;
+        curCompassRot = transform.rotation;
         rotRate = compassCenter.GetComponent<CompassCenter>().rotRate;
         shiftRate = compassCenter.GetComponent<CompassCenter>().shiftRate;
     }
@@ -93,7 +95,30 @@ public class Wizard : MonoBehaviour
                 // Handle storm mode actions
                 else
                 {
-                    //transform.Rotate(Vector3.up * 30 * Time.deltaTime);
+                    // Face the wizard in the direction of the mouse
+                    if (Input.mousePresent)
+                    {
+                        // Translate the mouse position to in game world position
+                        Vector2 mousePos = Input.mousePosition;
+                        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, Camera.main.nearClipPlane));
+
+                        // Raycast the mouse position find the apparent mouse position on the sea
+                        Vector3 mouseSeaPosition = new Vector3();
+                        RaycastHit mouseRayHit;
+                        if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit))
+                        {
+                            mouseSeaPosition = new Vector3(mouseRayHit.point.x, transform.position.y, mouseRayHit.point.z);
+                        }
+                        else
+                        {
+                            mouseSeaPosition = mouseWorldPosition;
+                        }
+                        
+                        // Rotate the wizard in the direction of the mouse point on the sea
+                        Vector3 direction = mouseSeaPosition - transform.position;
+                        transform.forward = direction;
+                    }
+                    // Do other stuff
                 }
                 break;
 
@@ -106,11 +131,9 @@ public class Wizard : MonoBehaviour
     IEnumerator ShiftMode()
     {
         shifting = true;
-        float shiftRate = compassCenter.GetComponent<CompassCenter>().shiftRate;
         Vector3 stormPos;
         Vector3 windPos;
         Quaternion stormRot;
-        Quaternion windRot;
         switch (curMode)
         {
             case Mode.WIND:
@@ -118,20 +141,20 @@ public class Wizard : MonoBehaviour
                 if (!positioning)
                 {
                     // Calculate the start and end positions of the mode shift
-                    stormPos = new Vector3(0, 0, compassCenter.transform.position.y - compassCenter.GetComponent<CompassCenter>().stormHeight);
                     windPos = transform.localPosition;
-                    stormRot = Quaternion.LookRotation(shipObject.GetComponent<ShipObject>().CurHeading);
-                    windRot = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
+                    stormPos = new Vector3(0, 0, compassCenter.transform.position.y - compassCenter.GetComponent<CompassCenter>().stormHeight);
+                    stormRot = shipObject.transform.rotation;
+                    curCompassRot = transform.rotation;
 
                     // Move wizard to storm mode position
                     for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
                     {
                         transform.localPosition = Vector3.Slerp(windPos, stormPos, shiftTime / shiftRate);
-                        //compassCenter.transform.rotation = Quaternion.Lerp(windRot, stormRot, shiftTime / shiftRate);
+                        transform.rotation = Quaternion.Slerp(curCompassRot, stormRot, shiftTime / shiftRate);
                         yield return null;
                     }
                     transform.localPosition = stormPos;
-                    //compassCenter.transform.rotation = stormRot;
+                    transform.rotation = stormRot;
                     curMode = Mode.STORM;
                 }
                 shifting = false;
@@ -142,18 +165,17 @@ public class Wizard : MonoBehaviour
                 // Calculate the start and end positions of the mode shift
                 stormPos = transform.localPosition;
                 windPos = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
-                stormRot = compassCenter.transform.rotation;
-                windRot = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
+                stormRot = transform.rotation;
 
                 // Move wizard to wind mode position
                 for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
                 {
                     transform.localPosition = Vector3.Slerp(stormPos, windPos, shiftTime / shiftRate);
-                    //compassCenter.transform.rotation = Quaternion.Lerp(stormRot, windRot, shiftTime / shiftRate);
+                    transform.rotation = Quaternion.Slerp(stormRot, curCompassRot, shiftTime / shiftRate);
                     yield return null;
                 }
                 transform.localPosition = windPos;
-                //compassCenter.transform.rotation = windRot;
+                transform.rotation = curCompassRot;
                 curMode = Mode.WIND;
                 shifting = false;
                 yield return null;

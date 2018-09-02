@@ -15,6 +15,7 @@ public class CompassCenter : MonoBehaviour
 
     private void Awake()
     {
+        // Create entries in the dictionary to hold rotations of compass positions
         cardinalRot.Add(new Vector2(0, 1), transform.rotation);     // position N
         cardinalRot.Add(new Vector2(1, 1), transform.rotation);     // position NE
         cardinalRot.Add(new Vector2(1, 0), transform.rotation);     // position E
@@ -25,16 +26,11 @@ public class CompassCenter : MonoBehaviour
         cardinalRot.Add(new Vector2(-1, 1), transform.rotation);    // position NW
 
         List<Vector2> cardRotIndex = new List<Vector2>(cardinalRot.Keys);
-        GameObject playerObject = GameObject.Find("Player");
-        if (playerObject == null)
-        {
-            Debug.LogError("Player object not found", playerObject);
-        }
-        Vector3 playerEulerRot = playerObject.transform.rotation.eulerAngles;
 
+        // Initialize the rotations of the compass positions
         for (int i = 0; i < cardRotIndex.Count; i++)
         {
-            cardinalRot[cardRotIndex[i]] = Quaternion.Euler(new Vector3(0, (45.0f * i), 0) + playerEulerRot + transform.rotation.eulerAngles);
+            cardinalRot[cardRotIndex[i]] = Quaternion.Euler(new Vector3(0, (45.0f * i), 0) + transform.rotation.eulerAngles);
         }
     }
 
