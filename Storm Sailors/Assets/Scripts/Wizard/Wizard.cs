@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum Mode { WIND, STORM }
+enum Mode { GALE = 0, STORM = 1 }
 
 public class Wizard : MonoBehaviour
 {
     // State variables to manage input events
-    private bool positioning = false;
     private bool shifting = false;
-    private Mode curMode = Mode.WIND;
+
+    private Mode curMode = Mode.GALE;
+    public int CurMode
+    {
+        get { return (int)curMode; }
+    }
 
     // Reference to game objects
     private GameObject compassCenter;
@@ -17,10 +21,7 @@ public class Wizard : MonoBehaviour
     private GameObject shipObject;
 
     // Wizard movement variables
-    private Vector2 curCompassPos = new Vector2(0, 0);
     private Quaternion curCompassRot = new Quaternion();
-    private Vector2 destinationCompassPos = new Vector2(0, 0);
-    private float rotRate;
     private float shiftRate;
 
     // Use this for initialization
@@ -53,10 +54,8 @@ public class Wizard : MonoBehaviour
         // Rotate wizard towards the center of the compass
         transform.LookAt(compassCenter.transform);
 
-        // Intialize curPos of wizard
-        curCompassPos = compassCenter.GetComponent<CompassCenter>().strtPos;
+        // Intialize rotation and mode shift time of wizard
         curCompassRot = transform.rotation;
-        rotRate = compassCenter.GetComponent<CompassCenter>().rotRate;
         shiftRate = compassCenter.GetComponent<CompassCenter>().shiftRate;
     }
 
@@ -66,23 +65,11 @@ public class Wizard : MonoBehaviour
         bool changeMode = Input.GetButtonDown("Change Mode");
         switch (curMode)
         {
-            case Mode.WIND:
+            case Mode.GALE:
                 // Change mode
                 if (changeMode && !shifting)
                 {
                     StartCoroutine(ShiftMode());
-                }
-                // Handle wind mode actions
-                else
-                {
-                    PositionAction();
-                    SummonAction();
-
-                    // Dispel all clouds
-                    if (Input.GetButton("Dispel All"))
-                    {
-                        cloudManager.GetComponent<CloudManager>().DispelAll();
-                    }
                 }
                 break;
 
@@ -91,34 +78,6 @@ public class Wizard : MonoBehaviour
                 if (changeMode && !shifting)
                 {
                     StartCoroutine(ShiftMode());
-                }
-                // Handle storm mode actions
-                else
-                {
-                    // Face the wizard in the direction of the mouse
-                    if (Input.mousePresent)
-                    {
-                        // Translate the mouse position to in game world position
-                        Vector2 mousePos = Input.mousePosition;
-                        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, Camera.main.nearClipPlane));
-
-                        // Raycast the mouse position find the apparent mouse position on the sea
-                        Vector3 mouseSeaPosition = new Vector3();
-                        RaycastHit mouseRayHit;
-                        if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit))
-                        {
-                            mouseSeaPosition = new Vector3(mouseRayHit.point.x, transform.position.y, mouseRayHit.point.z);
-                        }
-                        else
-                        {
-                            mouseSeaPosition = mouseWorldPosition;
-                        }
-                        
-                        // Rotate the wizard in the direction of the mouse point on the sea
-                        Vector3 direction = mouseSeaPosition - transform.position;
-                        transform.forward = direction;
-                    }
-                    // Do other stuff
                 }
                 break;
 
@@ -136,9 +95,9 @@ public class Wizard : MonoBehaviour
         Quaternion stormRot;
         switch (curMode)
         {
-            case Mode.WIND:
+            case Mode.GALE:
                 // Don't shift modes if wizard is changing compass position
-                if (!positioning)
+                if (!GetComponent<GaleMode>().Positioning)
                 {
                     // Calculate the start and end positions of the mode shift
                     windPos = transform.localPosition;
@@ -176,7 +135,7 @@ public class Wizard : MonoBehaviour
                 }
                 transform.localPosition = windPos;
                 transform.rotation = curCompassRot;
-                curMode = Mode.WIND;
+                curMode = Mode.GALE;
                 shifting = false;
                 yield return null;
                 break;
@@ -186,74 +145,5 @@ public class Wizard : MonoBehaviour
                 yield return null;
                 break;
         }
-    }
-
-    // Move wizard to new compass position
-    private void PositionAction()
-    {
-        // Construct position vector from input
-        float hInput = Input.GetAxisRaw("Horizontal");
-        float vInput = Input.GetAxisRaw("Vertical");
-        Vector2 posVect = new Vector2(hInput, vInput);
-
-        // Set up the start and end positions if not already repositioning
-        if (!positioning && posVect != new Vector2(0, 0))
-        {
-            destinationCompassPos = new Vector2(posVect.x, posVect.y);
-            positioning = true;
-        }
-
-        // Reposition wizard
-        if (positioning)
-        {
-            StartCoroutine(Position(destinationCompassPos));
-        }
-    }
-
-    // Summon or dispel cloud at wizard position
-    private void SummonAction()
-    {
-        if (Input.GetButtonDown("Summon") && !positioning)
-        {
-            // Dispel cloud at position
-            if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
-            {
-                cloudManager.GetComponent<CloudManager>().DispelThunderhead(curCompassPos);
-            }
-
-            // Summon a cloud at position
-            else
-            {
-                cloudManager.GetComponent<CloudManager>().SpawnThunderhead(curCompassPos);
-            }
-        }
-    }
-
-    // Reposition wizard
-    IEnumerator Position(Vector2 endPos)
-    {
-        // Set up the start and end rotations
-        Quaternion strtRot = compassCenter.GetComponent<CompassCenter>().PositionRot(curCompassPos);
-        Quaternion endRot = compassCenter.GetComponent<CompassCenter>().PositionRot(endPos);
-
-        for (float posTime = 0; posTime < rotRate; posTime += Time.deltaTime)
-        {
-            // Rotate the center of the rail to position the wizard
-            if (compassCenter != null)
-            {
-                compassCenter.transform.rotation = Quaternion.Slerp(strtRot, endRot, posTime / rotRate);
-            }
-            yield return null;
-        }
-
-        // Finalize rotation to account for for loop not quite rotating all the way
-        compassCenter.transform.rotation = endRot;
-
-        // update the current wizard position
-        curCompassPos = endPos;
-
-        // Reset timer and state flags
-        positioning = false;
-        yield return null;
     }
 }
