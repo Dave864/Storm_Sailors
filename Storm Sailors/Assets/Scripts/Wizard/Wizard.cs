@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum Mode { GALE = 0, STORM = 1 }
-
 public class Wizard : MonoBehaviour
 {
-    // State variables to manage input events
-    private bool shifting = false;
+    // Enumerators for the modes the wizard can be in
+    public enum Mode { GALE = 0, STORM = 1 }
 
     private Mode curMode = Mode.GALE;
-    public int CurMode
+    public Mode CurMode
     {
-        get { return (int)curMode; }
+        get { return curMode; }
     }
+
+    // State variables to manage input events
+    private bool shifting = false;
 
     // Reference to game objects
     private GameObject compassCenter;

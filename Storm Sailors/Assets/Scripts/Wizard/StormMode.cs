@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class StormMode : MonoBehaviour
 {
-    // State variables to manage input events
-    private readonly int StormModeVal = 1;
-
     // Reference to game objects
     private GameObject compassCenter;
     private GameObject cloudManager;
@@ -40,7 +37,7 @@ public class StormMode : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        if (GetComponent<Wizard>().CurMode == StormModeVal)
+        if (GetComponent<Wizard>().CurMode == Wizard.Mode.STORM)
         {
             // Execute various Storm mode actions
             WizardFaceMouse();

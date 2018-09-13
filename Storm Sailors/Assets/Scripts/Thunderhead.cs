@@ -5,7 +5,7 @@ using UnityEngine;
 public class Thunderhead : MonoBehaviour
 {
     // Strength level of the thunderhead gale
-    private int galeLvl = 1;
+    public int GaleLvl { get; set; }
 
     // Direction the thunderhead blows the wind
     private Vector3 galeVector = new Vector3(0, 0, 0);
@@ -25,11 +25,23 @@ public class Thunderhead : MonoBehaviour
         }
 
         galeVector = compassCenter.transform.position - transform.position;
+        GaleLvl = 1;
     }
 
-    // Convert gale strength level to actual float value
+    // Convert gale strength level to some float value
     public float GaleStrength()
     {
-        return galeLvl; // TODO: figure out strength calculation
+        return GaleLvl; // TODO: figure out strength calculation
+    }
+
+    // Merge thunderheads, the thunderhead that is passed into the function is destroyed
+    public void Merge(GameObject thunderheadToMerge)
+    {
+        Thunderhead thunderheadObj = thunderheadToMerge.GetComponent<Thunderhead>();
+        if(thunderheadObj != null)
+        {
+            GaleLvl += thunderheadObj.GaleLvl;
+            Destroy(thunderheadToMerge);
+        }
     }
 }
