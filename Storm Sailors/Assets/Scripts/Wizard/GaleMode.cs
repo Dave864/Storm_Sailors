@@ -6,12 +6,20 @@ using UnityEngine.UI;
 public class GaleMode : MonoBehaviour
 {
     // State variables to manage input events
+    private bool grabAction = false;
     private bool spawnDispelAction = false;
     private bool positioning = false;
     public bool Positioning
     {
         get { return positioning; }
     }
+
+    // Wizard timer variables
+    [SerializeField] private float cloudGrabTime = 0.1f;    // The time to confirm a grab action
+    private float curGrabTime = 0;                          // The timer for confirming a grab action
+    [SerializeField] private float cloudSpawnTime = 0.5f;   // The time in seconds it takes to spawn a cloud
+    [SerializeField] private float cloudDispelTime = 1f;    // The time in seconds it takes to dispel a cloud
+    [SerializeField] private Slider cloudTimerSlider;       // UI Slider object to serve as timer
 
     // Reference to held cloud
     private GameObject heldCloud;
@@ -25,11 +33,6 @@ public class GaleMode : MonoBehaviour
     private Vector2 curCompassPos = new Vector2(0, 0);
     private Vector2 destinationCompassPos = new Vector2(0, 0);
     private float rotRate;
-
-    // Wizard timer variables
-    [SerializeField] private float cloudSpawnTime = 0.5f;   // The time in seconds it takes to spawn a cloud
-    [SerializeField] private float cloudDispelTime = 1f;    // The time in seconds it takes to dispel a cloud
-    [SerializeField] private Slider cloudTimerSlider;       // UI Slider object to serve as timer
 
     // Use this for initialization
     private void Awake()
@@ -69,7 +72,7 @@ public class GaleMode : MonoBehaviour
         // Initialize the cloud timer to not be seen
         if (cloudTimerSlider != null)
         {
-            cloudTimerSlider.gameObject.SetActive(false);
+            cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
         }
         else
         {
@@ -87,14 +90,6 @@ public class GaleMode : MonoBehaviour
             PositionAction();
             CloudAction();
             // TODO: charge cloud
-
-            // Position Cloud Timer UI at wizard transform
-            if (cloudTimerSlider != null)
-            {
-                Vector3 cloudTimerWorldPosition = transform.position;
-                cloudTimerWorldPosition.y -= cloudManager.GetComponent<CloudManager>().dipVal;
-                cloudTimerSlider.transform.position = Camera.main.WorldToScreenPoint(cloudTimerWorldPosition);
-            }
 
             // Dispel all clouds
             if (Input.GetButton("Dispel All"))
@@ -157,44 +152,27 @@ public class GaleMode : MonoBehaviour
     // Conduct various cloud actions
     private void CloudAction()
     {
-        // Actions when the action button is tapped
-        // Tapping picks up or places a held cloud
-        /*if (Input.GetButtonDown("Cloud Action") && !spawnDispelAction && !positioning)
-        {
-            if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
-            {
-                // Dispel cloud at position (TEMPORARY)
-                cloudManager.GetComponent<CloudManager>().DispelThunderhead(curCompassPos);
-                // Pick up cloud
-                if (heldCloud != null)
-                {
-
-                }
-                else
-                {
-
-                }
-            }
-            else
-            {
-                cloudManager.GetComponent<CloudManager>().SpawnThunderhead(curCompassPos);
-                // Place cloud down
-                if (heldCloud != null)
-                {
-
-                }
-                else
-                {
-
-                }
-            }
-        }*/
-        // Actions when the action button is held
+        // Actions when the action button is pressed or held
         // Holding spawns or dispels a cloud
+        // Pressing grabs and places a cloud
         if (Input.GetButton("Cloud Action") && !spawnDispelAction && !positioning)
         {
-            if(heldCloud == null)
+            // Detect button press
+            if (Input.GetButtonDown("Cloud Action"))
             {
+                grabAction = true;
+                curGrabTime = 0;
+            }
+            // Timer to confirm grab action
+            else if (grabAction)
+            {
+                curGrabTime += Time.deltaTime;
+                grabAction = (curGrabTime <= cloudGrabTime);
+            }
+            // Execute spawn or dispel action
+            else if (heldCloud == null)
+            {
+                grabAction = false;
                 spawnDispelAction = true;
                 // Start dispelling cloud at current position
                 if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
@@ -208,8 +186,36 @@ public class GaleMode : MonoBehaviour
                 }
             }
         }
+
+        // Actions when the button is released
         else if(Input.GetButtonUp("Cloud Action"))
         {
+            // Execute the grab action
+            if (grabAction)
+            {
+                // Holding cloud
+                if (heldCloud != null)
+                {
+                    // Merge held cloud into cloud at position
+                    if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
+                    {
+                        cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
+                    }
+                    // Place cloud into empty position
+                    else
+                    {
+                        cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
+                    }
+                    grabAction = false;
+                }
+                // Pick up cloud if not holding a cloud
+                else if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
+                {
+                    heldCloud = cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
+                }
+            }
+            // Enables spawn and dispel actions to be executed again
+            // This accounts for when the action button is not released after the action has finished
             spawnDispelAction = false;
         }
     }
@@ -217,7 +223,7 @@ public class GaleMode : MonoBehaviour
     // Spawn or dispel cloud after a time
     IEnumerator SpawnDispelCloudTimer(bool spawn)
     {
-        cloudTimerSlider.gameObject.SetActive(true);
+        cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 1;
         float curTime = 0;
         bool actionActivated = false;
 
@@ -267,7 +273,7 @@ public class GaleMode : MonoBehaviour
         if (releasedActionButton || actionActivated)
         {
             spawnDispelAction = !releasedActionButton;
-            cloudTimerSlider.gameObject.SetActive(false);
+            cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
             cloudTimerSlider.value = 0;
         }
         yield return null;

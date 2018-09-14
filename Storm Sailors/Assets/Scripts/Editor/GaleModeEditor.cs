@@ -8,12 +8,14 @@ using UnityEditor;
 public class GaleModeEditor : Editor
 {
     // Properties to alter
+    SerializedProperty s_cloudGrabTime;
     SerializedProperty s_cloudSpawnTime;
     SerializedProperty s_cloudDispelTime;
     SerializedProperty s_cloudTimerSlider;
 
 	protected virtual void OnEnable()
     {
+        s_cloudGrabTime = serializedObject.FindProperty("cloudGrabTime");
         s_cloudSpawnTime = serializedObject.FindProperty("cloudSpawnTime");
         s_cloudDispelTime = serializedObject.FindProperty("cloudDispelTime");
         s_cloudTimerSlider = serializedObject.FindProperty("cloudTimerSlider");
@@ -22,6 +24,14 @@ public class GaleModeEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+
+        // Adjust the time threshold for confirming a grab action
+        EditorGUI.BeginChangeCheck();
+        float grabTime = EditorGUILayout.Slider("Grab Threshold (sec)", s_cloudGrabTime.floatValue, 0.01f, 0.15f);
+        if (EditorGUI.EndChangeCheck())
+        {
+            s_cloudGrabTime.floatValue = grabTime;
+        }
 
         // Adjust the time it takes to spawn a cloud
         EditorGUI.BeginChangeCheck();

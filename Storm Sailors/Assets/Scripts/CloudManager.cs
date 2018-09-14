@@ -22,7 +22,7 @@ public class CloudManager : MonoBehaviour
 
     // Reference to other game objects
     private GameObject compassCenter;
-    private GameObject wizard;
+    private GameObject wizardObject;
 
     // Use this for initialization
     void Start()
@@ -38,10 +38,10 @@ public class CloudManager : MonoBehaviour
         }
 
         // Establish reference to wizard
-        wizard = GameObject.Find("Wizard Object");
-        if (wizard == null)
+        wizardObject = GameObject.Find("Wizard Object");
+        if (wizardObject == null)
         {
-            Debug.LogError("Wizard Object object not found", wizard);
+            Debug.LogError("Wizard Object object not found", wizardObject);
         }
 
         // Initialize thunderheadPos
@@ -74,9 +74,9 @@ public class CloudManager : MonoBehaviour
     // Summon a new thunderhead
     public void SpawnThunderhead(Vector2 cardinalPos = default(Vector2))
     {
-        Vector3 wizardPos = wizard.transform.position;
+        Vector3 wizardPos = wizardObject.transform.position;
         GameObject newThunderhead;
-        switch (wizard.GetComponent<Wizard>().CurMode)
+        switch (wizardObject.GetComponent<Wizard>().CurMode)
         {
             // Gale mode
             case Wizard.Mode.GALE:
@@ -112,15 +112,64 @@ public class CloudManager : MonoBehaviour
     }
 
     // Pick up or place thunderheads in gale mode
-    public GameObject MoveThunderHead(Vector2 cardinalPos = default(Vector2), GameObject heldCloud = default(GameObject))
+    public GameObject MoveThunderHead(Vector2 cardinalPos, ref GameObject heldCloud)
     {
-        switch (wizard.GetComponent<Wizard>().CurMode)
+        switch (wizardObject.GetComponent<Wizard>().CurMode)
         {
             // Gale Mode
             case Wizard.Mode.GALE:
-                break;
-            // Storm Mode
-            case Wizard.Mode.STORM:
+                if (heldCloud == null)
+                {
+                    // Pick up cloud at cardinal position
+                    if (ThunderheadAtPos(cardinalPos))
+                    {
+                        GameObject cloudToGrab = thunderheadPos[cardinalPos];
+
+                        // Update combined gale vector
+                        CombinedGaleVector -= cloudToGrab.GetComponent<Thunderhead>().GaleVector;
+
+                        // Raise the thunderhead by the dip value
+                        Vector3 newPos = cloudToGrab.transform.position;
+                        cloudToGrab.transform.position = new Vector3(newPos.x, newPos.y + dipVal, newPos.z);
+
+                        // Remove the thunderhead from the container
+                        thunderheadPos[cardinalPos] = null;
+                        cloudToGrab.GetComponent<Thunderhead>().isHeld = true;
+                        cloudToGrab.transform.parent = wizardObject.transform;
+                        return cloudToGrab;
+                    }
+                    return null;
+                }
+                else
+                {
+                    // Merge held cloud into cloud at position
+                    if (ThunderheadAtPos(cardinalPos))
+                    {
+                    }
+                    // Place cloud at position
+                    else
+                    {
+                        // Put held cloud back into thunderhead container
+                        heldCloud.transform.parent = transform;
+                        thunderheadPos[cardinalPos] = heldCloud;
+                        GameObject placedCloud = thunderheadPos[cardinalPos];
+                        
+                        // Clear the wizard's held cloud object
+                        heldCloud = null;
+                        placedCloud.GetComponent<Thunderhead>().isHeld = false;
+
+                        // Update the gale vector of the newly positioned thunderhead
+                        placedCloud.transform.LookAt(compassCenter.transform.position, Vector3.up);
+                        placedCloud.GetComponent<Thunderhead>().GaleVector = compassCenter.transform.position - placedCloud.transform.position;
+
+                        // Update combined gale vector
+                        CombinedGaleVector += placedCloud.GetComponent<Thunderhead>().GaleVector;
+
+                        // Lower the thunderhead by the dip value
+                        Vector3 newPos = placedCloud.transform.position;
+                        placedCloud.transform.position = new Vector3(newPos.x, newPos.y - dipVal, newPos.z);
+                    }
+                }
                 break;
             default:
                 break;
@@ -131,7 +180,7 @@ public class CloudManager : MonoBehaviour
     // Dispel a thunderhead
     public void DispelThunderhead(Vector2 cardinalPos = default(Vector2))
     {
-        switch (wizard.GetComponent<Wizard>().CurMode)
+        switch (wizardObject.GetComponent<Wizard>().CurMode)
         {
             // Gale mode
             case Wizard.Mode.GALE:

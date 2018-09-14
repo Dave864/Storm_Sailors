@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     // References to components of player
     private GameObject compassCenter;
     private GameObject cloudManager;
-    private GameObject wizard;
+    private GameObject wizardObject;
     private GameObject ship;
 
     // Movement parameters
@@ -29,10 +29,10 @@ public class Player : MonoBehaviour
         }
 
         // Establish reference to wizard
-        wizard = gameObject.transform.Find("Compass/Compass Center/Wizard Object").gameObject;
-        if (wizard == null)
+        wizardObject = gameObject.transform.Find("Compass/Compass Center/Wizard Object").gameObject;
+        if (wizardObject == null)
         {
-            Debug.LogError("Wizard object not found", wizard);
+            Debug.LogError("Wizard object not found", wizardObject);
         }
 
         // Establish reference to ship
