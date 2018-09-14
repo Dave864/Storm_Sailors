@@ -8,10 +8,10 @@ public class GaleMode : MonoBehaviour
     // State variables to manage input events
     private bool grabAction = false;
     private bool spawnDispelAction = false;
-    private bool positioning = false;
+    private bool positionAction = false;
     public bool Positioning
     {
-        get { return positioning; }
+        get { return positionAction; }
     }
 
     // Wizard timer variables
@@ -86,17 +86,26 @@ public class GaleMode : MonoBehaviour
         // Execute Gale mode actions
         if (GetComponent<Wizard>().CurMode == Wizard.Mode.GALE)
         {
-            // Execute various Gale mode actions
-            PositionAction();
-            CloudAction();
-            // TODO: charge cloud
-
             // Dispel all clouds
-            if (Input.GetButton("Dispel All"))
+            if (Input.GetButton("Dispel All") && !positionAction && !spawnDispelAction && !grabAction)
             {
                 cloudManager.GetComponent<CloudManager>().DispelAll();
             }
+            else
+            {
+                // Execute various Gale mode actions
+                PositionAction();
+                CloudAction();
+            }
         }
+    }
+
+    // Dispel all clouds after a time
+    IEnumerator DispelAllAction()
+    {
+        float curTime = 0;
+        float dispelAllTime = 0;
+        yield return null;
     }
 
     // Move wizard to new compass position
@@ -108,14 +117,14 @@ public class GaleMode : MonoBehaviour
         Vector2 posVect = new Vector2(hInput, vInput);
 
         // Set up the start and end positions if not already repositioning and not conducting a cloud action
-        if (!spawnDispelAction && !positioning && posVect != new Vector2(0, 0))
+        if (!spawnDispelAction && !positionAction && posVect != new Vector2(0, 0))
         {
             destinationCompassPos = new Vector2(posVect.x, posVect.y);
-            positioning = true;
+            positionAction = true;
         }
 
         // Reposition wizard
-        if (positioning)
+        if (positionAction)
         {
             StartCoroutine(Position(destinationCompassPos));
         }
@@ -145,7 +154,7 @@ public class GaleMode : MonoBehaviour
         curCompassPos = endPos;
 
         // Reset timer and state flags
-        positioning = false;
+        positionAction = false;
         yield return null;
     }
 
@@ -155,7 +164,7 @@ public class GaleMode : MonoBehaviour
         // Actions when the action button is pressed or held
         // Holding spawns or dispels a cloud
         // Pressing grabs and places a cloud
-        if (Input.GetButton("Cloud Action") && !spawnDispelAction && !positioning)
+        if (Input.GetButton("Cloud Action") && !spawnDispelAction && !positionAction)
         {
             // Detect button press
             if (Input.GetButtonDown("Cloud Action"))
@@ -214,6 +223,7 @@ public class GaleMode : MonoBehaviour
                     heldCloud = cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
                 }
             }
+
             // Enables spawn and dispel actions to be executed again
             // This accounts for when the action button is not released after the action has finished
             spawnDispelAction = false;

@@ -145,6 +145,9 @@ public class CloudManager : MonoBehaviour
                     // Merge held cloud into cloud at position
                     if (ThunderheadAtPos(cardinalPos))
                     {
+                        thunderheadPos[cardinalPos].GetComponent<Thunderhead>().Merge(heldCloud);
+                        heldCloud = null;
+                        curCloudCnt--;
                     }
                     // Place cloud at position
                     else
