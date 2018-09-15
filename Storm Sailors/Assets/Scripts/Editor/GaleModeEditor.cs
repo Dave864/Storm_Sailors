@@ -12,6 +12,7 @@ public class GaleModeEditor : Editor
     SerializedProperty s_cloudSpawnTime;
     SerializedProperty s_cloudDispelTime;
     SerializedProperty s_cloudTimerSlider;
+    SerializedProperty s_dispelAllMult;
 
 	protected virtual void OnEnable()
     {
@@ -19,6 +20,7 @@ public class GaleModeEditor : Editor
         s_cloudSpawnTime = serializedObject.FindProperty("cloudSpawnTime");
         s_cloudDispelTime = serializedObject.FindProperty("cloudDispelTime");
         s_cloudTimerSlider = serializedObject.FindProperty("cloudTimerSlider");
+        s_dispelAllMult = serializedObject.FindProperty("dispelAllMult");
     }
 
     public override void OnInspectorGUI()
@@ -51,6 +53,9 @@ public class GaleModeEditor : Editor
 
         // Set the reference to slider ui for the cloud timer
         EditorGUILayout.PropertyField(s_cloudTimerSlider);
+
+        // Curve drawer editor for dispel all time
+        EditorGUILayout.PropertyField(s_dispelAllMult);
 
         serializedObject.ApplyModifiedProperties();
     }

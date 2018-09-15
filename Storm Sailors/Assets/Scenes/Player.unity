@@ -910,6 +910,42 @@ MonoBehaviour:
   cloudSpawnTime: 0.5
   cloudDispelTime: 1
   cloudTimerSlider: {fileID: 976050651}
+  dispelAllMult:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 0.7525253
+      outSlope: 0.7525253
+      tangentMode: 34
+    - serializedVersion: 2
+      time: 3
+      value: 2.0101013
+      inSlope: 0.37626266
+      outSlope: 0.37626266
+      tangentMode: 34
+    - serializedVersion: 2
+      time: 7
+      value: 3
+      inSlope: 0.18623734
+      outSlope: 0.18623734
+      tangentMode: 34
+    - serializedVersion: 2
+      time: 15
+      value: 4
+      inSlope: 0.0865454
+      outSlope: 0.0865454
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!114 &1987107439
 MonoBehaviour:
   m_ObjectHideFlags: 0

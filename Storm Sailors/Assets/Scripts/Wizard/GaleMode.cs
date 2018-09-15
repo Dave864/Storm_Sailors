@@ -20,6 +20,7 @@ public class GaleMode : MonoBehaviour
     [SerializeField] private float cloudSpawnTime = 0.5f;   // The time in seconds it takes to spawn a cloud
     [SerializeField] private float cloudDispelTime = 1f;    // The time in seconds it takes to dispel a cloud
     [SerializeField] private Slider cloudTimerSlider;       // UI Slider object to serve as timer
+    [SerializeField] private AnimationCurve dispelAllMult;  // Curve for time for the dispel all action
 
     // Reference to held cloud
     private GameObject heldCloud;
@@ -89,7 +90,8 @@ public class GaleMode : MonoBehaviour
             // Dispel all clouds
             if (Input.GetButton("Dispel All") && !positionAction && !spawnDispelAction && !grabAction)
             {
-                cloudManager.GetComponent<CloudManager>().DispelAll();
+                //cloudManager.GetComponent<CloudManager>().DispelAll();
+                StartCoroutine(DispelAllAction());
             }
             else
             {
@@ -104,7 +106,38 @@ public class GaleMode : MonoBehaviour
     IEnumerator DispelAllAction()
     {
         float curTime = 0;
-        float dispelAllTime = 0;
+        float dispelAllTime = cloudDispelTime;
+        bool actionActivated = false;
+
+        // Check if dispel all multiplier curve accounts for possibility of eight spawned clouds
+        if (dispelAllMult == null)
+        {
+            Debug.LogError("No curve created for the Dispel All multiplier");
+        }
+        else if (dispelAllMult[dispelAllMult.length - 1].time >= 8f)
+        {
+            dispelAllTime *= dispelAllMult.Evaluate(cloudManager.GetComponent<CloudManager>().CurCloudCnt);
+        }
+
+        // See if player holds dispel button long enough to execute action
+        cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 1;
+        while (Input.GetButton("Dispel All") && !actionActivated)
+        {
+            cloudTimerSlider.value = curTime / dispelAllTime;
+            curTime += Time.deltaTime;
+            if (curTime >= dispelAllTime)
+            {
+                actionActivated = true;
+            }
+            yield return null;
+        }
+        cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
+
+        // Execute the dispel all action
+        if (actionActivated)
+        {
+            cloudManager.GetComponent<CloudManager>().DispelAll();
+        }
         yield return null;
     }
 

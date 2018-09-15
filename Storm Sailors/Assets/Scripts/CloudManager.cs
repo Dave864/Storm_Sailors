@@ -7,6 +7,7 @@ public class CloudManager : MonoBehaviour
     // Variables for managing spawned clouds
     public int maxCloudCnt = 3;
     private int curCloudCnt = 0;
+    public int CurCloudCnt { get { return curCloudCnt; } }
     public float dipVal = 0.5f;
     public GameObject thunderheadPrefab;
 
