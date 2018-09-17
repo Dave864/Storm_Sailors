@@ -155,7 +155,7 @@ public class Wizard : MonoBehaviour
                 windPos = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
                 stormRot = transform.rotation;
 
-                // Dispel storm cloud
+                // Dispel storm cloud if cloud is not at a sustainable level
                 if (cloudManager.GetComponent<CloudManager>().StormCloudRef)
                 {
                     int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl;

@@ -103,7 +103,7 @@ public class CloudManager : MonoBehaviour
 
             // Storm mode
             case Wizard.Mode.STORM:
-                // Instantiate storm thunderhead at position of wizard (TEMPORARY)
+                // Instantiate storm thunderhead at position of wizard
                 StormCloudRef = Instantiate(thunderheadPrefab, wizardPos, Quaternion.identity, transform);                
                 break;
 

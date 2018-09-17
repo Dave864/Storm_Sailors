@@ -14,7 +14,7 @@ public class GaleMode : MonoBehaviour
         get { return positionAction; }
     }
 
-    // Wizard timer variables
+    // Wizard gale mode timer variables
     [SerializeField] private float cloudGrabTime = 0.1f;    // The time to confirm a grab action
     private float curGrabTime = 0;                          // The timer for confirming a grab action
     [SerializeField] private float cloudSpawnTime = 0.5f;   // The time in seconds it takes to spawn a cloud
@@ -22,15 +22,15 @@ public class GaleMode : MonoBehaviour
     [SerializeField] private Slider cloudTimerSlider;       // UI Slider object to serve as timer
     [SerializeField] private AnimationCurve dispelAllMult;  // Curve for time for the dispel all action
 
-    // Reference to game objects
-    private GameObject compassCenter;
-    private GameObject cloudManager;
-    private GameObject shipObject;
-
     // Wizard movement variables
     private Vector2 curCompassPos = new Vector2(0, 0);
     private Vector2 destinationCompassPos = new Vector2(0, 0);
     private float rotRate;
+
+    // Reference to game objects
+    private GameObject compassCenter;
+    private GameObject cloudManager;
+    private GameObject shipObject;
 
     // Use this for initialization
     private void Awake()
