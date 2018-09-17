@@ -14,43 +14,42 @@ public class Player : MonoBehaviour
     private GameObject ship;
 
     // Movement parameters
-    private readonly int defaultSpeed = 500;        // The default base speed of the ship
-    private readonly float defaultRotRate = 0.1f;   // The default time it takes to change wizard position in sec
-    private int baseSpeed;                          // The used base speed of the ship
+    private readonly int defaultSpeed = 500; // The default base speed of the ship
+    private int baseSpeed;                   // The used base speed of the ship
 
     // Use this for initialization
     void Start()
     {
         // Establish reference to compass center
         compassCenter = gameObject.transform.Find("Compass/Compass Center").gameObject;
-        if (compassCenter == null)
+        if (!compassCenter)
         {
             Debug.LogError("Compass Center object not found", compassCenter);
         }
 
         // Establish reference to wizard
         wizardObject = gameObject.transform.Find("Compass/Compass Center/Wizard Object").gameObject;
-        if (wizardObject == null)
+        if (!wizardObject)
         {
             Debug.LogError("Wizard object not found", wizardObject);
         }
 
         // Establish reference to ship
         ship = gameObject.transform.Find("Ship Object").gameObject;
-        if (ship == null)
+        if (!ship)
         {
             Debug.LogError("Ship object not found", ship);
         }
 
         // Establish reference to cloud manager
         cloudManager = gameObject.transform.Find("Compass/Cloud Manager").gameObject;
-        if (cloudManager == null)
+        if (!cloudManager)
         {
             Debug.LogError("Cloud Manager object not found", cloudManager);
         }
 
         // Initialize the movement parameters
-        baseSpeed = (ship == null) ? defaultSpeed : ship.GetComponent<ShipObject>().baseSpeed;
+        baseSpeed = (!ship) ? defaultSpeed : ship.GetComponent<ShipObject>().baseSpeed;
 
         // Set initial position of player
         transform.position = new Vector3(startPos.x, transform.position.y, startPos.z);

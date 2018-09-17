@@ -112,14 +112,14 @@ public class CloudManager : MonoBehaviour
         }
     }
 
-    // Pick up or place thunderheads in gale mode
+    // Pick up or place thunderheads
     public GameObject MoveThunderHead(Vector2 cardinalPos, ref GameObject heldCloud)
     {
         switch (wizardObject.GetComponent<Wizard>().CurMode)
         {
             // Gale Mode
             case Wizard.Mode.GALE:
-                if (heldCloud == null)
+                if (!heldCloud)
                 {
                     // Pick up cloud at cardinal position
                     if (ThunderheadAtPos(cardinalPos))
@@ -174,6 +174,26 @@ public class CloudManager : MonoBehaviour
                         placedCloud.transform.position = new Vector3(newPos.x, newPos.y - dipVal, newPos.z);
                     }
                 }
+                break;
+            case Wizard.Mode.STORM:
+                // Make held cloud the storm cloud
+                if (!StormCloudRef)
+                {
+                    StormCloudRef = heldCloud;
+                    StormCloudRef.transform.parent = transform;
+                }
+                // Merge held cloud into storm cloud
+                else
+                {
+                    StormCloudRef.GetComponent<Thunderhead>().Merge(heldCloud);
+                    // If the new gale level goes above the overload level, the storm cloud "explodes"
+                    if (wizardObject.GetComponent<StormMode>().StormLevelOverload < StormCloudRef.GetComponent<Thunderhead>().GaleLvl)
+                    {
+                        DispelThunderhead();
+                    }
+                }
+                curCloudCnt--;
+                heldCloud = null;
                 break;
             default:
                 break;

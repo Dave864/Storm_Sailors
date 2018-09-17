@@ -9,26 +9,32 @@ public class StormMode : MonoBehaviour
     private GameObject cloudManager;
     private GameObject shipObject;
 
+    // Storm level thresholds
+    [SerializeField] private int stormLevelSustainable = 3;
+    [SerializeField] private int stormLevelOverload = 5;
+    public int StormLevelSustainable { get { return stormLevelSustainable; } }
+    public int StormLevelOverload { get { return stormLevelOverload; } }
+
     // Use this for initialization
     private void Awake()
     {
         // Get reference to cloud manager
         cloudManager = GameObject.Find("Cloud Manager");
-        if (cloudManager == null)
+        if (!cloudManager)
         {
             Debug.LogError("Cloud Manager object not found", cloudManager);
         }
 
         // Get reference to compass center
         compassCenter = GameObject.Find("Compass Center");
-        if (compassCenter == null)
+        if (!compassCenter)
         {
             Debug.LogError("Compass Center object not found", compassCenter);
         }
 
         // Get reference to ship object
         shipObject = GameObject.Find("Ship Object");
-        if (shipObject == null)
+        if (!shipObject)
         {
             Debug.LogError("Ship Object object not found", shipObject);
         }

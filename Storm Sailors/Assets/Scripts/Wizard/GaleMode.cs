@@ -22,9 +22,6 @@ public class GaleMode : MonoBehaviour
     [SerializeField] private Slider cloudTimerSlider;       // UI Slider object to serve as timer
     [SerializeField] private AnimationCurve dispelAllMult;  // Curve for time for the dispel all action
 
-    // Reference to held cloud
-    private GameObject heldCloud;
-
     // Reference to game objects
     private GameObject compassCenter;
     private GameObject cloudManager;
@@ -40,21 +37,21 @@ public class GaleMode : MonoBehaviour
     {
         // Get reference to cloud manager
         cloudManager = GameObject.Find("Cloud Manager");
-        if (cloudManager == null)
+        if (!cloudManager)
         {
             Debug.LogError("Cloud Manager object not found", cloudManager);
         }
 
         // Get reference to compass center
         compassCenter = GameObject.Find("Compass Center");
-        if (compassCenter == null)
+        if (!compassCenter)
         {
             Debug.LogError("Compass Center object not found", compassCenter);
         }
 
         // Get reference to ship object
         shipObject = GameObject.Find("Ship Object");
-        if (shipObject == null)
+        if (!shipObject)
         {
             Debug.LogError("Ship Object object not found", shipObject);
         }
@@ -68,10 +65,10 @@ public class GaleMode : MonoBehaviour
         rotRate = compassCenter.GetComponent<CompassCenter>().rotRate;
 
         // Initialize the wizard to not be holding any clouds
-        heldCloud = null;
+        transform.GetComponent<Wizard>().heldCloud = null;
 
         // Initialize the cloud timer to not be seen
-        if (cloudTimerSlider != null)
+        if (cloudTimerSlider)
         {
             cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
         }
@@ -173,7 +170,7 @@ public class GaleMode : MonoBehaviour
         for (float posTime = 0; posTime < rotRate; posTime += Time.deltaTime)
         {
             // Rotate the center of the rail to position the wizard
-            if (compassCenter != null)
+            if (compassCenter)
             {
                 compassCenter.transform.rotation = Quaternion.Slerp(strtRot, endRot, posTime / rotRate);
             }
@@ -212,7 +209,7 @@ public class GaleMode : MonoBehaviour
                 grabAction = (curGrabTime <= cloudGrabTime);
             }
             // Execute spawn or dispel action
-            else if (heldCloud == null)
+            else if (!transform.GetComponent<Wizard>().heldCloud)
             {
                 grabAction = false;
                 spawnDispelAction = true;
@@ -236,24 +233,17 @@ public class GaleMode : MonoBehaviour
             if (grabAction)
             {
                 // Holding cloud
-                if (heldCloud != null)
+                if (transform.GetComponent<Wizard>().heldCloud)
                 {
-                    // Merge held cloud into cloud at position
-                    if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
-                    {
-                        cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
-                    }
-                    // Place cloud into empty position
-                    else
-                    {
-                        cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
-                    }
+                    // Place cloud at position or merge held cloud into cloud at position
+                    cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref transform.GetComponent<Wizard>().heldCloud);
                     grabAction = false;
                 }
                 // Pick up cloud if not holding a cloud
                 else if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
                 {
-                    heldCloud = cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref heldCloud);
+                    GameObject cloud = cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref transform.GetComponent<Wizard>().heldCloud);
+                    transform.GetComponent<Wizard>().heldCloud = cloud;
                 }
             }
 

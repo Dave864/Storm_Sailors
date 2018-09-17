@@ -15,6 +15,9 @@ public class Wizard : MonoBehaviour
 
     // State variables to manage input events
     private bool shifting = false;
+    
+    // Reference to held cloud
+    [HideInInspector] public GameObject heldCloud;
 
     // Reference to game objects
     private GameObject compassCenter;
@@ -55,6 +58,9 @@ public class Wizard : MonoBehaviour
         // Rotate wizard towards the center of the compass
         transform.LookAt(compassCenter.transform);
 
+        // Initialize held cloud to be null
+        heldCloud = null;
+
         // Intialize rotation and mode shift time of wizard
         curCompassRot = transform.rotation;
         shiftRate = compassCenter.GetComponent<CompassCenter>().shiftRate;
@@ -94,6 +100,7 @@ public class Wizard : MonoBehaviour
         Vector3 stormPos;
         Vector3 windPos;
         Quaternion stormRot;
+        Quaternion thunderheadRot;
         switch (curMode)
         {
             // Shift from gale mode to storm mode
@@ -107,19 +114,35 @@ public class Wizard : MonoBehaviour
                     stormRot = shipObject.transform.rotation;
                     curCompassRot = transform.rotation;
 
+                    // Get the start rotation of the held thunderhead
+                    thunderheadRot = (heldCloud != null) ? heldCloud.transform.rotation : Quaternion.identity;
+                    if (heldCloud)
+                    {
+                        heldCloud.GetComponent<Thunderhead>().isHeld = false;
+                    }
+
                     // Move wizard to storm mode position
                     for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
                     {
                         transform.localPosition = Vector3.Slerp(windPos, stormPos, shiftTime / shiftRate);
                         transform.rotation = Quaternion.Slerp(curCompassRot, stormRot, shiftTime / shiftRate);
+
+                        // Rotate held cloud
+                        if (heldCloud)
+                        {
+                            heldCloud.transform.rotation = Quaternion.Slerp(thunderheadRot, stormRot, shiftTime / shiftRate);
+                        }
                         yield return null;
                     }
                     transform.localPosition = stormPos;
                     transform.rotation = stormRot;
                     curMode = Mode.STORM;
 
-                    // Spawn storm thunderhead (TEMPORARY)
-                    cloudManager.GetComponent<CloudManager>().SpawnThunderhead();
+                    // Merge held cloud into storm cloud
+                    if (heldCloud)
+                    {
+                        cloudManager.GetComponent<CloudManager>().MoveThunderHead(Vector2.zero, ref heldCloud);
+                    }
                 }
                 shifting = false;
                 yield return null;
@@ -127,13 +150,20 @@ public class Wizard : MonoBehaviour
             
             // Shift from storm mode to gale mode
             case Mode.STORM:
-                // Dispel storm thunderhead (TEMPORARY?)
-                cloudManager.GetComponent<CloudManager>().DispelThunderhead();
-
                 // Calculate the start and end positions of the mode shift
                 stormPos = transform.localPosition;
                 windPos = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
                 stormRot = transform.rotation;
+
+                // Dispel storm cloud
+                if (cloudManager.GetComponent<CloudManager>().StormCloudRef)
+                {
+                    int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl;
+                    if (stormLvl < transform.GetComponent<StormMode>().StormLevelSustainable)
+                    {
+                        cloudManager.GetComponent<CloudManager>().DispelThunderhead();
+                    }
+                }
 
                 // Move wizard to gale mode position
                 for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)

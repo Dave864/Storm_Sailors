@@ -745,7 +745,7 @@ GameObject:
   - component: {fileID: 1794936203}
   - component: {fileID: 1794936202}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: 'Canvas: Player UI'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -895,6 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd9d075b615778c4e8a4dea5a9d3cdf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heldCloud: {fileID: 0}
 --- !u!114 &1987107438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,7 +907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d9d2143b9257d040a81c1bce0621684, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cloudGrabTime: 0.1
+  cloudGrabTime: 0.15
   cloudSpawnTime: 0.5
   cloudDispelTime: 1
   cloudTimerSlider: {fileID: 976050651}
@@ -957,6 +958,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85f68a38712ea56418c2b2638aabc9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stormLevelSustainable: 3
+  stormLevelOverload: 6
 --- !u!1 &2035762855
 GameObject:
   m_ObjectHideFlags: 0

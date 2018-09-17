@@ -73,7 +73,7 @@ public class TestWizard : MonoBehaviour
     // Summon or dispel cloud at wizard position
     private void SummonAction()
     {
-        if (Input.GetButton("Summon") && !positioning)
+        if (Input.GetButton("Cloud Action") && !positioning)
         {
             if (!spawnPressed)
             {

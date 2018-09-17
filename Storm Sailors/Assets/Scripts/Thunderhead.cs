@@ -26,7 +26,7 @@ public class Thunderhead : MonoBehaviour
     {
         // Initialize gale vector
         compassCenter = GameObject.Find("Compass Center");
-        if (compassCenter == null)
+        if (!compassCenter)
         {
             Debug.LogError("Compass Center object not found", compassCenter);
         }
@@ -44,6 +44,16 @@ public class Thunderhead : MonoBehaviour
         }
     }
 
+    // Draw GUI elements
+    private void OnGUI()
+    {
+        // Display label indicating cloud gale level
+        Vector3 thunderheadScreenPos = Camera.main.WorldToScreenPoint(transform.position);
+        Vector2 labelPos = new Vector2(thunderheadScreenPos.x, Camera.main.pixelHeight - thunderheadScreenPos.y);
+        Vector2 labelSize = new Vector2(50, 50);
+        GUI.Label(new Rect(labelPos, labelSize), GaleLvl.ToString());
+    }
+
     // Convert gale strength level to some float value
     public float GaleStrength()
     {
@@ -54,7 +64,7 @@ public class Thunderhead : MonoBehaviour
     public void Merge(GameObject thunderheadToMerge)
     {
         Thunderhead thunderheadObj = thunderheadToMerge.GetComponent<Thunderhead>();
-        if(thunderheadObj != null)
+        if(thunderheadObj)
         {
             GaleLvl += thunderheadObj.GaleLvl;
             Destroy(thunderheadToMerge);

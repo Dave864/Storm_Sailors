@@ -29,7 +29,7 @@ public class GaleModeEditor : Editor
 
         // Adjust the time threshold for confirming a grab action
         EditorGUI.BeginChangeCheck();
-        float grabTime = EditorGUILayout.Slider("Grab Threshold (sec)", s_cloudGrabTime.floatValue, 0.01f, 0.15f);
+        float grabTime = EditorGUILayout.Slider("Grab Threshold (sec)", s_cloudGrabTime.floatValue, 0.01f, 0.3f);
         if (EditorGUI.EndChangeCheck())
         {
             s_cloudGrabTime.floatValue = grabTime;
