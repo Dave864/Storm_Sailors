@@ -149,6 +149,12 @@ public class CloudManager : MonoBehaviour
                         thunderheadPos[cardinalPos].GetComponent<Thunderhead>().Merge(heldCloud);
                         heldCloud = null;
                         curCloudCnt--;
+
+                        // Dispel cloud if new level exceeds overload level
+                        if (wizardObject.GetComponent<GaleMode>().CloudLevelOverload < thunderheadPos[cardinalPos].GetComponent<Thunderhead>().GaleLvl)
+                        {
+                            DispelThunderhead(cardinalPos);
+                        }
                     }
                     // Place cloud at position
                     else
@@ -175,6 +181,8 @@ public class CloudManager : MonoBehaviour
                     }
                 }
                 break;
+            
+            // Storm Mode
             case Wizard.Mode.STORM:
                 // Make held cloud the storm cloud
                 if (!StormCloudRef)

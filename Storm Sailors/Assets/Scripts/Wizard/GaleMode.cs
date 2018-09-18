@@ -22,6 +22,10 @@ public class GaleMode : MonoBehaviour
     [SerializeField] private Slider cloudTimerSlider;       // UI Slider object to serve as timer
     [SerializeField] private AnimationCurve dispelAllMult;  // Curve for time for the dispel all action
 
+    // Max level a gale cloud can be at
+    [SerializeField] private int cloudLevelOverload = 3;
+    public int CloudLevelOverload { get { return cloudLevelOverload; } }
+
     // Wizard movement variables
     private Vector2 curCompassPos = new Vector2(0, 0);
     private Vector2 destinationCompassPos = new Vector2(0, 0);

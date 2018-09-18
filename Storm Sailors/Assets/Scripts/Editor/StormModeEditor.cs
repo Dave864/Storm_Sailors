@@ -14,12 +14,15 @@ public class StormModeEditor : Editor
     SerializedProperty s_stormLevelOverload;
 
     // Range values for storm level GUI
-    private readonly int maxLevel = 20;
+    private readonly int maxLevel = 10;
     private float minStormValue;
     private float maxStormValue;
 
-	// Use this for initialization
-	void OnEnable()
+    // Value of level to check
+    int lvlToCheck;
+
+    // Use this for initialization
+    void OnEnable()
     {
         s_stormSpawnTime = serializedObject.FindProperty("stormSpawnTime");
         s_stormChargeMult = serializedObject.FindProperty("stormChargeMult");
@@ -28,6 +31,7 @@ public class StormModeEditor : Editor
         s_stormLevelOverload = serializedObject.FindProperty("stormLevelOverload");
         minStormValue = s_stormLevelSustainable.intValue;
         maxStormValue = s_stormLevelOverload.intValue;
+        lvlToCheck = 0;
 	}
 
     public override void OnInspectorGUI()
@@ -39,14 +43,23 @@ public class StormModeEditor : Editor
 
         // Set base charge time
         EditorGUI.BeginChangeCheck();
-        float spawnTime = EditorGUILayout.DelayedFloatField("Initial Spawn Time", s_stormSpawnTime.floatValue);
+        float spawnTime = EditorGUILayout.DelayedFloatField("Initial Spawn Time (sec)", s_stormSpawnTime.floatValue);
         if (EditorGUI.EndChangeCheck())
         {
-            s_stormSpawnTime.floatValue = (spawnTime < 0) ? 0 : spawnTime;
+            spawnTime = (spawnTime < 0) ? 0 : spawnTime;
+            s_stormSpawnTime.floatValue = spawnTime;
         }
 
         // Set multiplier curve for charge time
         EditorGUILayout.PropertyField(s_stormChargeMult);
+
+        // Show the charge time for various levels
+        EditorGUILayout.BeginVertical("Box");
+        EditorGUILayout.LabelField("Charge Time Viewer");
+        lvlToCheck = EditorGUILayout.IntSlider("Level", lvlToCheck, 0, Mathf.RoundToInt(maxStormValue) + 1);
+        float chargeTime = s_stormChargeMult.animationCurveValue.Evaluate(lvlToCheck) * spawnTime;
+        EditorGUILayout.LabelField("Charge Time (sec): " + chargeTime);
+        EditorGUILayout.EndVertical();
         
         EditorGUILayout.EndVertical();
         EditorGUILayout.BeginVertical("Box");

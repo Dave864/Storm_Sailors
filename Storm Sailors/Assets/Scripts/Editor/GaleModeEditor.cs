@@ -8,6 +8,7 @@ using UnityEditor;
 public class GaleModeEditor : Editor
 {
     // Properties to alter
+    SerializedProperty s_cloudLevelOverload;
     SerializedProperty s_cloudGrabTime;
     SerializedProperty s_cloudSpawnTime;
     SerializedProperty s_cloudDispelTime;
@@ -16,6 +17,7 @@ public class GaleModeEditor : Editor
 
 	protected virtual void OnEnable()
     {
+        s_cloudLevelOverload = serializedObject.FindProperty("cloudLevelOverload");
         s_cloudGrabTime = serializedObject.FindProperty("cloudGrabTime");
         s_cloudSpawnTime = serializedObject.FindProperty("cloudSpawnTime");
         s_cloudDispelTime = serializedObject.FindProperty("cloudDispelTime");
@@ -26,6 +28,15 @@ public class GaleModeEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+
+        // Adjust the max level a gale cloud can be at
+        EditorGUI.BeginChangeCheck();
+        int lvl = EditorGUILayout.DelayedIntField("Max Gale Cloud Level", s_cloudLevelOverload.intValue);
+        if (EditorGUI.EndChangeCheck())
+        {
+            lvl = (lvl < 0) ? 0 : lvl;
+            s_cloudLevelOverload.intValue = lvl;
+        }
 
         // Adjust the time threshold for confirming a grab action
         EditorGUI.BeginChangeCheck();

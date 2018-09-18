@@ -160,6 +160,11 @@ public class StormMode : MonoBehaviour
             if (actionActivated)
             {
                 cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl++;
+                // Dispel storm cloud if overcharged (TEMPORARY)
+                if (stormLvl + 1 > StormLevelOverload)
+                {
+                    cloudManager.GetComponent<CloudManager>().DispelThunderhead();
+                }
             }
         }
 

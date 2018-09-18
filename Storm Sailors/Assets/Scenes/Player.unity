@@ -1246,36 +1246,30 @@ MonoBehaviour:
       value: 0
       inSlope: 1
       outSlope: 1
-      tangentMode: 34
+      tangentMode: 0
     - serializedVersion: 2
       time: 1
       value: 1
-      inSlope: 0.7525253
-      outSlope: 0.7525253
-      tangentMode: 34
+      inSlope: 1.0001659
+      outSlope: 1.0001659
+      tangentMode: 0
     - serializedVersion: 2
       time: 3
-      value: 2.0101013
-      inSlope: 0.37626266
-      outSlope: 0.37626266
-      tangentMode: 34
-    - serializedVersion: 2
-      time: 7
       value: 3
-      inSlope: 0.18623734
-      outSlope: 0.18623734
-      tangentMode: 34
+      inSlope: 1.1575282
+      outSlope: 5.121049
+      tangentMode: 1
     - serializedVersion: 2
-      time: 15
-      value: 4
-      inSlope: 0.0865454
-      outSlope: 0.0865454
+      time: 8
+      value: 10.959595
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
   stormSpawnTime: 0.5
-  stormLevelSustainable: 3
+  stormLevelSustainable: 4
   stormLevelOverload: 6
 --- !u!1 &2035762855
 GameObject:
