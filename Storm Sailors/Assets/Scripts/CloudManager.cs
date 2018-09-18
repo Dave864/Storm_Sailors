@@ -194,6 +194,7 @@ public class CloudManager : MonoBehaviour
                 else
                 {
                     StormCloudRef.GetComponent<Thunderhead>().Merge(heldCloud);
+
                     // If the new gale level goes above the overload level, the storm cloud "explodes"
                     if (wizardObject.GetComponent<StormMode>().StormLevelOverload < StormCloudRef.GetComponent<Thunderhead>().GaleLvl)
                     {
