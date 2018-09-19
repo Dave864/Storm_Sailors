@@ -5,8 +5,9 @@ using UnityEngine.UI;
 
 public class StormMode : MonoBehaviour
 {
-    // State variables to manage input events
-    private bool charging = false;
+    // Enumerator for the various actions in Storm mode
+    public enum Action { DEFAULT, CHARGE, LAUNCH}
+    private Action curAction = Action.DEFAULT;
 
     // Wizard storm mode timer variables
     [SerializeField] private Slider stormTimerSlider;        // UI Slider object to serve as timer
@@ -70,17 +71,25 @@ public class StormMode : MonoBehaviour
         {
             // Execute various Storm mode actions
             WizardFaceMouse();
-            if (Input.GetButton("Cloud Action") && !charging)
+            if (Input.GetButton("Cloud Action") && curAction == Action.DEFAULT)
             {
                 StartCoroutine(ChargeThunderhead());
             }
+            if (Input.GetButtonDown("Fire1") && curAction == Action.DEFAULT)
+            {
+                GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
+                if (stormCloud)
+                {
+                    cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
+                    stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
+                }
+            }
             // TODO: Gather thunderheads
-            // TODO: Launch thunderhead
         }
     }
 
     // Rotate the wizard to face the position of the mouse
-    void WizardFaceMouse ()
+    private void WizardFaceMouse ()
     {
         if (Input.mousePresent)
         {
@@ -91,7 +100,8 @@ public class StormMode : MonoBehaviour
             // Raycast the mouse position find the apparent mouse position on the sea
             Vector3 mouseSeaPosition = new Vector3();
             RaycastHit mouseRayHit;
-            if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit))
+            int layerMask = 1 << 4;
+            if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit, Mathf.Infinity, layerMask))
             {
                 mouseSeaPosition = new Vector3(mouseRayHit.point.x, transform.position.y, mouseRayHit.point.z);
             }
@@ -109,7 +119,7 @@ public class StormMode : MonoBehaviour
     // Charge up thunderheaed to create or strengthen a storm cloud
     IEnumerator ChargeThunderhead()
     {
-        charging = true;
+        curAction = Action.CHARGE;
         bool actionActivated = false;
         float chargeTime;
         float curTime = 0;
@@ -171,7 +181,7 @@ public class StormMode : MonoBehaviour
         // Reset the timer
         stormTimerSlider.value = 0;
         stormTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
-        charging = false;
+        curAction = Action.DEFAULT;
         yield return null;
     }
 }

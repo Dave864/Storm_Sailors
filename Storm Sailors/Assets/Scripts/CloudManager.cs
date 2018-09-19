@@ -135,7 +135,7 @@ public class CloudManager : MonoBehaviour
 
                         // Remove the thunderhead from the container
                         thunderheadPos[cardinalPos] = null;
-                        cloudToGrab.GetComponent<Thunderhead>().isHeld = true;
+                        cloudToGrab.GetComponent<Thunderhead>().IsHeld = true;
                         cloudToGrab.transform.parent = wizardObject.transform;
                         return cloudToGrab;
                     }
@@ -166,7 +166,7 @@ public class CloudManager : MonoBehaviour
                         
                         // Clear the wizard's held cloud object
                         heldCloud = null;
-                        placedCloud.GetComponent<Thunderhead>().isHeld = false;
+                        placedCloud.GetComponent<Thunderhead>().IsHeld = false;
 
                         // Update the gale vector of the newly positioned thunderhead
                         placedCloud.transform.LookAt(compassCenter.transform.position, Vector3.up);

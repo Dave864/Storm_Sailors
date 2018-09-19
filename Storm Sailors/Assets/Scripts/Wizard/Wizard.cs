@@ -6,12 +6,8 @@ public class Wizard : MonoBehaviour
 {
     // Enumerators for the modes the wizard can be in
     public enum Mode { GALE = 0, STORM = 1 }
-
     private Mode curMode = Mode.GALE;
-    public Mode CurMode
-    {
-        get { return curMode; }
-    }
+    public Mode CurMode { get { return curMode; } }
 
     // State variables to manage input events
     private bool shifting = false;
@@ -118,7 +114,7 @@ public class Wizard : MonoBehaviour
                     thunderheadRot = (heldCloud != null) ? heldCloud.transform.rotation : Quaternion.identity;
                     if (heldCloud)
                     {
-                        heldCloud.GetComponent<Thunderhead>().isHeld = false;
+                        heldCloud.GetComponent<Thunderhead>().IsHeld = false;
                     }
 
                     // Move wizard to storm mode position

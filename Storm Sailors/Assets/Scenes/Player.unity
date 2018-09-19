@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 322509166}
   - component: {fileID: 322509167}
   - component: {fileID: 322509168}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Launch Vector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -348,11 +348,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1831962662354824, guid: 61a8db8f94cef6e43ad5324e340c51df, type: 2}
       propertyPath: m_Layer
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1381489207649956, guid: 61a8db8f94cef6e43ad5324e340c51df, type: 2}
       propertyPath: m_Layer
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 61a8db8f94cef6e43ad5324e340c51df, type: 2}
@@ -411,7 +411,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: be49b2781fc5dbf48946be1d725b8efc, type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: be49b2781fc5dbf48946be1d725b8efc, type: 3}
       propertyPath: m_LocalScale.x
@@ -727,7 +727,7 @@ GameObject:
   m_Component:
   - component: {fileID: 873176340}
   - component: {fileID: 873176341}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Compass Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -773,7 +773,7 @@ GameObject:
   m_Component:
   - component: {fileID: 890854125}
   - component: {fileID: 890854126}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Ship Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -923,7 +923,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1345500508}
   - component: {fileID: 1345500509}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Compass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1072,7 +1072,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1874705143}
   - component: {fileID: 1874705144}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Cloud Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1226,7 +1226,7 @@ GameObject:
   - component: {fileID: 1987107437}
   - component: {fileID: 1987107438}
   - component: {fileID: 1987107439}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Wizard Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1353,7 +1353,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  stormSpawnTime: 0.5
+  stormSpawnTime: 0.6
   stormLevelSustainable: 4
   stormLevelOverload: 6
 --- !u!1 &2035762855
@@ -1365,7 +1365,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2035762856}
   - component: {fileID: 2035762857}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1412,7 +1412,7 @@ GameObject:
   - component: {fileID: 2105658535}
   - component: {fileID: 2105658534}
   - component: {fileID: 2105658533}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
