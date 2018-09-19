@@ -37,7 +37,6 @@ public class StormModeEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-
         EditorGUILayout.BeginVertical("Box");
         EditorGUILayout.LabelField("Charge Time Settings");
 

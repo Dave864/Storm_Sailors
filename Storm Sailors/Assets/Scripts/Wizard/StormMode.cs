@@ -12,7 +12,9 @@ public class StormMode : MonoBehaviour
     // Wizard storm mode timer variables
     [SerializeField] private Slider stormTimerSlider;        // UI Slider object to serve as timer
     [SerializeField] private AnimationCurve stormChargeMult; // Curve to determine the timer multiplier for charging storm cloud
-    [SerializeField] private float stormSpawnTime = 0.5f;    // Time to spawn intial storm cloud
+    [SerializeField] private float stormSpawnTime = 0.5f;    // The time to spawn intial storm cloud
+    private readonly float stormLaunchTime = 0.15f;          // The time to confirm a launch action
+    private float curLaunchTime = 0;                         // The timer for confirming a launch action
 
     // Storm level thresholds
     [SerializeField] private int stormLevelSustainable = 3;
@@ -71,19 +73,7 @@ public class StormMode : MonoBehaviour
         {
             // Execute various Storm mode actions
             WizardFaceMouse();
-            if (Input.GetButton("Cloud Action") && curAction == Action.DEFAULT)
-            {
-                StartCoroutine(ChargeThunderhead());
-            }
-            if (Input.GetButtonDown("Fire1") && curAction == Action.DEFAULT)
-            {
-                GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
-                if (stormCloud)
-                {
-                    cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
-                    stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
-                }
-            }
+            StormActions();
             // TODO: Gather thunderheads
         }
     }
@@ -113,6 +103,46 @@ public class StormMode : MonoBehaviour
             // Rotate the wizard in the direction of the mouse point on the sea
             Vector3 direction = mouseSeaPosition - transform.position;
             transform.forward = direction;
+        }
+    }
+
+    // Conduct various storm actions
+    private void StormActions()
+    {
+        // Actions when the action button is held or pressed
+        // Pressing the button launches the storm thunderhead
+        // Holding the button charges the storm thunderhead
+        if (Input.GetButton("Cloud Action") && (curAction == Action.DEFAULT || curAction == Action.LAUNCH))
+        {
+            // Begin checking for confirmation of launch action
+            if (Input.GetButtonDown("Cloud Action"))
+            {
+                curAction = Action.LAUNCH;
+                curLaunchTime = 0;
+            }
+            // Check for confirmation of launch action
+            else if (curAction == Action.LAUNCH)
+            {
+                curLaunchTime += Time.deltaTime;
+                curAction = (curLaunchTime <= stormLaunchTime) ? Action.LAUNCH : Action.DEFAULT;
+            }
+            // Execute charge action
+            else
+            {
+                StartCoroutine(ChargeThunderhead());
+            }
+        }
+
+        // Actions when the action button is released
+        // The launch action will execute if the charge action has not started
+        else if (Input.GetButtonUp("Cloud Action") && curAction == Action.LAUNCH)
+        {
+            GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
+            if (stormCloud)
+            {
+                cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
+                stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
+            }
         }
     }
 
