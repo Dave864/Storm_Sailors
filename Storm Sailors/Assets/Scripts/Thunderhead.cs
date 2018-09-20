@@ -98,11 +98,11 @@ public class Thunderhead : MonoBehaviour
     // Destroy thunderhead when it is no longer visible
     private void OnBecameInvisible()
     {
-        Destroy(gameObject);
+        Destroy(gameObject, 0.2f);
     }
 
     // Convert gale strength level to some float value
-    public float GaleStrength()
+    public float CloudStrength()
     {
         return GaleLvl; // TODO: figure out strength calculation
     }
@@ -142,5 +142,15 @@ public class Thunderhead : MonoBehaviour
 
         launchEffectArea.enabled = true;
         transform.SetParent(null);
+    }
+
+    // Handle collisions
+    public void OnTriggerEnter(Collider other)
+    {
+        if (curState == ThunderheadState.LAUNCHED && other.CompareTag("Obstacle"))
+        {
+            Destroy(other.gameObject);
+            Destroy(gameObject);
+        }
     }
 }

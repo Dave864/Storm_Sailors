@@ -6,11 +6,12 @@ public class ShipObject : MonoBehaviour
 {
     // State variables
     private bool shipIsRotating = false;
+    private bool noGale = true;
 
     // Movement parameters
-    [HideInInspector]
-    public int baseSpeed = 100;     // The base movement speed of the chosen ship
-    private float turnRate = 45.0f; // The turning rate in deg / sec
+    [HideInInspector] public int baseSpeed = 100;       // The base movement speed of the chosen ship
+    [HideInInspector] public float slowTime = 1.0f;     // The time it takes for the chosen ship to come to a stop
+    private float turnRate = 45.0f;                     // The turning rate in deg / sec
 
     // The current direction vector of the ship
     public Vector3 CurHeading { get; set; }
@@ -21,10 +22,12 @@ public class ShipObject : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        // Get movement parameters of chosen ship
         GameObject selectedShip = gameObject.transform.GetChild(0).gameObject;
         if (selectedShip)
         {
             baseSpeed = selectedShip.GetComponent<Ship>().baseSpeed;
+            slowTime = selectedShip.GetComponent<Ship>().slowTime;
             turnRate = selectedShip.GetComponent<Ship>().turnRate;
         }
         else
@@ -32,6 +35,7 @@ public class ShipObject : MonoBehaviour
             Debug.LogError("No ship selected for ShipObject", selectedShip);
         }
 
+        // Get reference to cloud manager object
         cloudManager = GameObject.Find("Cloud Manager");
         if(!cloudManager)
         {
@@ -50,6 +54,7 @@ public class ShipObject : MonoBehaviour
         {
             CurHeading = Vector3.zero;
         }
+        noGale = (galeDir == Vector3.zero);
         // Set heading to match galeDir
         if (!shipIsRotating && galeDir != CurHeading)
         {
@@ -76,6 +81,11 @@ public class ShipObject : MonoBehaviour
         {
             transform.rotation = Quaternion.Slerp(strtRotation, endRotation, curTime / rotTime);
             CurHeading = transform.forward.normalized;
+            // Stop rotating if there is no gale
+            if (noGale)
+            {
+                curTime = rotTime;
+            }
             yield return null;
         }
         CurHeading = transform.forward.normalized;

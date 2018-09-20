@@ -14,8 +14,13 @@ public class Player : MonoBehaviour
     private GameObject ship;
 
     // Movement parameters
-    private readonly int defaultSpeed = 500; // The default base speed of the ship
-    private int baseSpeed;                   // The used base speed of the ship
+    private readonly int defaultSpeed = 500;       // The default base speed of the ship
+    private int baseSpeed;                         // The used base speed of the ship
+    private float curSpeed;                        // The current speed of the ship
+    private readonly float defaultSlowTime = 1.0f; // The default deceleration rate of the shape
+    private float slowTime;                        // The rate the ship slows down when no wind is present
+    private float curSlowTime;                     // The current amount of time spent slowing down
+    private Vector3 lastHeading;                   // The vector of the last heading created by gale clouds
 
     // Use this for initialization
     void Start()
@@ -50,6 +55,10 @@ public class Player : MonoBehaviour
 
         // Initialize the movement parameters
         baseSpeed = (!ship) ? defaultSpeed : ship.GetComponent<ShipObject>().baseSpeed;
+        curSpeed = 0;
+        slowTime = (!ship) ? defaultSlowTime : ship.GetComponent<ShipObject>().slowTime;
+        curSlowTime = 0;
+        lastHeading = Vector3.zero;
 
         // Set initial position of player
         transform.position = new Vector3(startPos.x, transform.position.y, startPos.z);
@@ -64,7 +73,29 @@ public class Player : MonoBehaviour
             Application.Quit();
         }
 
-        // Move the player entity based off of the heading of the ship
-        transform.position += ship.GetComponent<ShipObject>().CurHeading * baseSpeed * Time.deltaTime;
+        // Decelerate the player entity if there is no gale blowing
+        if (ship.GetComponent<ShipObject>().CurHeading == Vector3.zero)
+        {
+            //curSpeed -= slowTime;
+            //curSpeed = (curSpeed < 0) ? 0 : curSpeed;
+            if (curSlowTime <= slowTime)
+            {
+                curSpeed = baseSpeed * ((slowTime - curSlowTime) / slowTime);
+                curSlowTime += Time.deltaTime;
+            }
+            else
+            {
+                curSpeed = 0;
+            }
+        }
+        // Move the player entity at full speed at the ship's current heading
+        else
+        {
+            lastHeading = ship.GetComponent<ShipObject>().CurHeading;
+            curSpeed = baseSpeed;
+            curSlowTime = 0;
+        }
+        // Move the player entity
+        transform.position += lastHeading * curSpeed * Time.deltaTime;
     }
 }

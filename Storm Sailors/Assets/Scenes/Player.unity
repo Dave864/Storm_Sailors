@@ -354,6 +354,16 @@ Prefab:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114201513334225660, guid: 61a8db8f94cef6e43ad5324e340c51df,
+        type: 2}
+      propertyPath: baseDeceleration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114201513334225660, guid: 61a8db8f94cef6e43ad5324e340c51df,
+        type: 2}
+      propertyPath: slowTime
+      value: 0.75
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 61a8db8f94cef6e43ad5324e340c51df, type: 2}
   m_IsPrefabParent: 0
@@ -806,6 +816,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseSpeed: 100
+  slowTime: 1
 --- !u!1 &976050649
 GameObject:
   m_ObjectHideFlags: 0
@@ -1460,7 +1471,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 12
+  orthographic size: 20
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1483,7 +1494,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2105658532}
   m_LocalRotation: {x: 0.33909407, y: -0.12265456, z: 0.044642597, w: 0.9316535}
-  m_LocalPosition: {x: 4.5, y: 18, z: -15}
+  m_LocalPosition: {x: 3.6, y: 22.1, z: -11.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2035762856}
