@@ -1365,6 +1365,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   stormSpawnTime: 0.6
+  stormLaunchTime: 0.15
+  stormGatherTime: 0.75
   stormLevelSustainable: 4
   stormLevelOverload: 6
 --- !u!1 &2035762855

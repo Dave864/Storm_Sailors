@@ -116,7 +116,7 @@ public class GaleMode : MonoBehaviour
         }
         else if (dispelAllMult[dispelAllMult.length - 1].time >= 8f)
         {
-            dispelAllTime *= dispelAllMult.Evaluate(cloudManager.GetComponent<CloudManager>().CurCloudCnt);
+            dispelAllTime *= dispelAllMult.Evaluate(cloudManager.GetComponent<CloudManager>().CurGaleCloudCnt);
         }
 
         // See if player holds dispel button long enough to execute action
@@ -212,7 +212,7 @@ public class GaleMode : MonoBehaviour
                 curAction = Action.DISPAWN;
 
                 // Start dispelling cloud at current position
-                if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
+                if (cloudManager.GetComponent<CloudManager>().IsThunderheadAtPos(curCompassPos))
                 {
                     StartCoroutine(SpawnDispelCloudTimer(false));
                 }
@@ -237,7 +237,7 @@ public class GaleMode : MonoBehaviour
                     cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref transform.GetComponent<Wizard>().heldCloud);
                 }
                 // Pick up cloud if not holding a cloud
-                else if (cloudManager.GetComponent<CloudManager>().ThunderheadAtPos(curCompassPos))
+                else if (cloudManager.GetComponent<CloudManager>().IsThunderheadAtPos(curCompassPos))
                 {
                     GameObject cloud = cloudManager.GetComponent<CloudManager>().MoveThunderHead(curCompassPos, ref transform.GetComponent<Wizard>().heldCloud);
                     transform.GetComponent<Wizard>().heldCloud = cloud;

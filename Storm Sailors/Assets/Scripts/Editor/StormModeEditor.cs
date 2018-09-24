@@ -7,7 +7,9 @@ using UnityEditor;
 public class StormModeEditor : Editor
 {
     // Properites to change
+    SerializedProperty s_stormLaunchTime;
     SerializedProperty s_stormSpawnTime;
+    SerializedProperty s_stormGatherTime;
     SerializedProperty s_stormChargeMult;
     SerializedProperty s_stormTimerSlider;
     SerializedProperty s_stormLevelSustainable;
@@ -24,7 +26,9 @@ public class StormModeEditor : Editor
     // Use this for initialization
     void OnEnable()
     {
+        s_stormLaunchTime = serializedObject.FindProperty("stormLaunchTime");
         s_stormSpawnTime = serializedObject.FindProperty("stormSpawnTime");
+        s_stormGatherTime = serializedObject.FindProperty("stormGatherTime");
         s_stormChargeMult = serializedObject.FindProperty("stormChargeMult");
         s_stormTimerSlider = serializedObject.FindProperty("stormTimerSlider");
         s_stormLevelSustainable = serializedObject.FindProperty("stormLevelSustainable");
@@ -37,6 +41,23 @@ public class StormModeEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+
+        // Set launch threshold time
+        EditorGUI.BeginChangeCheck();
+        float launchTime = EditorGUILayout.Slider("Launch Threshold (sec)", s_stormLaunchTime.floatValue, 0.01f, 0.3f);
+        if (EditorGUI.EndChangeCheck())
+        {
+            s_stormLaunchTime.floatValue = launchTime;
+        }
+
+        // Set gale cloud gather time
+        EditorGUI.BeginChangeCheck();
+        float gatherTime = EditorGUILayout.Slider("Gale Cloud Gather (sec)", s_stormGatherTime.floatValue, 0f, 1.0f);
+        if (EditorGUI.EndChangeCheck())
+        {
+            s_stormGatherTime.floatValue = gatherTime;
+        }
+
         EditorGUILayout.BeginVertical("Box");
         EditorGUILayout.LabelField("Charge Time Settings");
 

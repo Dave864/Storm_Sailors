@@ -6,14 +6,15 @@ using UnityEngine.UI;
 public class StormMode : MonoBehaviour
 {
     // Enumerator for the various actions in Storm mode
-    public enum Action { DEFAULT, CHARGE, LAUNCH}
+    public enum Action { DEFAULT, CHARGE, GATHER, LAUNCH }
     private Action curAction = Action.DEFAULT;
 
     // Wizard storm mode timer variables
     [SerializeField] private Slider stormTimerSlider;        // UI Slider object to serve as timer
     [SerializeField] private AnimationCurve stormChargeMult; // Curve to determine the timer multiplier for charging storm cloud
     [SerializeField] private float stormSpawnTime = 0.5f;    // The time to spawn intial storm cloud
-    private readonly float stormLaunchTime = 0.15f;          // The time to confirm a launch action
+    [SerializeField] private float stormLaunchTime = 0.15f;  // The time to confirm a launch action
+    [SerializeField] private float stormGatherTime = 0.5f;   // The time to gather spawned gale clouds
     private float curLaunchTime = 0;                         // The timer for confirming a launch action
 
     // Storm level thresholds
@@ -74,7 +75,10 @@ public class StormMode : MonoBehaviour
             // Execute various Storm mode actions
             WizardFaceMouse();
             StormActions();
-            // TODO: Gather thunderheads
+            if (Input.GetButtonDown("Dispel All") && curAction == Action.DEFAULT)
+            {
+                StartCoroutine(GatherGaleClouds());
+            }
         }
     }
 
@@ -140,9 +144,14 @@ public class StormMode : MonoBehaviour
             GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
             if (stormCloud)
             {
-                cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
-                stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
+                // Launch storm cloud if it is not sustainable
+                if (stormCloud.GetComponent<Thunderhead>().GaleLvl < stormLevelSustainable)
+                {
+                    cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
+                    stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
+                }
             }
+            curAction = Action.DEFAULT;
         }
     }
 
@@ -212,6 +221,66 @@ public class StormMode : MonoBehaviour
         stormTimerSlider.value = 0;
         stormTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
         curAction = Action.DEFAULT;
+        yield return null;
+    }
+
+    // Gather all spawned gale clouds and merge them into the storm cloud
+    IEnumerator GatherGaleClouds()
+    {
+        curAction = Action.GATHER;
+
+        // Set up container to keep track of spawned gale clouds
+        int posCount = cloudManager.GetComponent<CloudManager>().CardinalPos.Count;
+        List<GameObject> spawnedGaleClouds =  new List<GameObject>();
+        List<Vector3> galeCloudPositions = new List<Vector3>();
+
+        // Get all of the spawned gale clouds
+        for (int posIndex = 0; posIndex < posCount; posIndex++)
+        {
+            Vector2 curPos = cloudManager.GetComponent<CloudManager>().CardinalPos[posIndex];
+            GameObject spawnedCloud = cloudManager.GetComponent<CloudManager>().GetThunderheadFromGale(curPos, true);
+            if (spawnedCloud)
+            {
+                spawnedGaleClouds.Add(spawnedCloud);
+                galeCloudPositions.Add(spawnedCloud.transform.localPosition);
+            }
+            yield return null;
+        }
+
+        // Move spawned gale clouds to storm cloud position
+        Coroutine[] movingClouds = new Coroutine[spawnedGaleClouds.Count];
+        for (int i = 0; i < spawnedGaleClouds.Count; i++)
+        {
+            movingClouds[i] = StartCoroutine(MoveGaleToStorm(spawnedGaleClouds[i], galeCloudPositions[i]));
+        }
+
+        // Wait for the clouds to finish moving
+        for (int i = 0; i < movingClouds.Length; i++)
+        {
+            yield return movingClouds[i];
+        }
+
+        // Merge spawned gale clouds into storm cloud
+        for (int i = 0; i < spawnedGaleClouds.Count; i++)
+        {
+            GameObject galeCloud = spawnedGaleClouds[i];
+            cloudManager.GetComponent<CloudManager>().MoveThunderHead(Vector2.zero, ref galeCloud);
+            yield return null;
+        }
+
+        curAction = Action.DEFAULT;
+        yield return null;
+    }
+
+    // Move spawned gale cloud to storm cloud position
+    IEnumerator MoveGaleToStorm (GameObject galeCloud, Vector3 startPos)
+    {
+        for (float curTime = 0; curTime < stormGatherTime; curTime += Time.deltaTime)
+        {
+            galeCloud.transform.localPosition = Vector3.Slerp(startPos, transform.localPosition, curTime / stormGatherTime);
+            yield return null;
+        }
+        galeCloud.transform.localPosition = transform.localPosition;
         yield return null;
     }
 }

@@ -6,8 +6,8 @@ public class CloudManager : MonoBehaviour
 {
     // Variables for managing spawned clouds
     public int maxCloudCnt = 3;
-    private int curCloudCnt = 0;
-    public int CurCloudCnt { get { return curCloudCnt; } }
+    private int curGaleCloudCnt = 0;
+    public int CurGaleCloudCnt { get { return curGaleCloudCnt; } }
     public float dipVal = 0.5f;
     public GameObject thunderheadPrefab;
 
@@ -19,7 +19,7 @@ public class CloudManager : MonoBehaviour
     public GameObject StormCloudRef { get; set; }
 
     // List of keys for thunderheadPos container
-    private List<Vector2> cardinalPos;
+    public List<Vector2> CardinalPos { get; private set; }
 
     // Reference to other game objects
     private GameObject compassCenter;
@@ -56,20 +56,43 @@ public class CloudManager : MonoBehaviour
         thunderheadPos.Add(new Vector2(-1, 1), null);   // position NW
 
         // Initialize list of keys
-        cardinalPos = new List<Vector2>(thunderheadPos.Keys);
+        CardinalPos = new List<Vector2>(thunderheadPos.Keys);
 
         // Initialize the storm cloud reference
         StormCloudRef = null;
     }
 
     // Return whether a thunderhead is at pos
-    public bool ThunderheadAtPos(Vector2 pos)
+    public bool IsThunderheadAtPos(Vector2 pos)
     {
         if (thunderheadPos.ContainsKey(pos))
         {
             return thunderheadPos[pos] != null;
         }
         return false;
+    }
+
+    // Get the thunderhead in gale mode to move to storm mode
+    public GameObject GetThunderheadFromGale(Vector2 pos, bool toStorm = false)
+    {
+        if (IsThunderheadAtPos(pos))
+        {
+            if (toStorm)
+            {
+                CombinedGaleVector -= thunderheadPos[pos].GetComponent<Thunderhead>().GaleVector;
+                GameObject galeCloud = thunderheadPos[pos];
+                thunderheadPos[pos] = null;
+                return galeCloud;
+            }
+            else
+            {
+                return thunderheadPos[pos];
+            }
+        }
+        else
+        {
+            return null;
+        }
     }
 
     // Summon a new thunderhead
@@ -81,7 +104,7 @@ public class CloudManager : MonoBehaviour
         {
             // Gale mode
             case Wizard.Mode.GALE:
-                if (curCloudCnt < maxCloudCnt && thunderheadPos.ContainsKey(cardinalPos) && thunderheadPos[cardinalPos] == null)
+                if (curGaleCloudCnt < maxCloudCnt && thunderheadPos.ContainsKey(cardinalPos) && thunderheadPos[cardinalPos] == null)
                 {
                     // Instantiate gale thunderhead at position of wizard
                     newThunderhead = Instantiate(thunderheadPrefab, wizardPos, Quaternion.identity, transform);
@@ -94,7 +117,7 @@ public class CloudManager : MonoBehaviour
 
                     // Add thunderhead to container
                     thunderheadPos[cardinalPos] = newThunderhead;
-                    curCloudCnt++;
+                    curGaleCloudCnt++;
 
                     // Update combined gale vector
                     CombinedGaleVector += newThunderhead.GetComponent<Thunderhead>().GaleVector;
@@ -122,7 +145,7 @@ public class CloudManager : MonoBehaviour
                 if (!heldCloud)
                 {
                     // Pick up cloud at cardinal position
-                    if (ThunderheadAtPos(cardinalPos))
+                    if (IsThunderheadAtPos(cardinalPos))
                     {
                         GameObject cloudToGrab = thunderheadPos[cardinalPos];
 
@@ -144,11 +167,11 @@ public class CloudManager : MonoBehaviour
                 else
                 {
                     // Merge held cloud into cloud at position
-                    if (ThunderheadAtPos(cardinalPos))
+                    if (IsThunderheadAtPos(cardinalPos))
                     {
                         thunderheadPos[cardinalPos].GetComponent<Thunderhead>().Merge(heldCloud);
                         heldCloud = null;
-                        curCloudCnt--;
+                        curGaleCloudCnt--;
 
                         // Dispel cloud if new level exceeds overload level
                         if (wizardObject.GetComponent<GaleMode>().CloudLevelOverload < thunderheadPos[cardinalPos].GetComponent<Thunderhead>().GaleLvl)
@@ -163,6 +186,7 @@ public class CloudManager : MonoBehaviour
                         heldCloud.transform.parent = transform;
                         thunderheadPos[cardinalPos] = heldCloud;
                         GameObject placedCloud = thunderheadPos[cardinalPos];
+                        curGaleCloudCnt--;
                         
                         // Clear the wizard's held cloud object
                         heldCloud = null;
@@ -201,7 +225,7 @@ public class CloudManager : MonoBehaviour
                         DispelThunderhead();
                     }
                 }
-                curCloudCnt--;
+                curGaleCloudCnt--;
                 heldCloud = null;
                 break;
             default:
@@ -217,7 +241,7 @@ public class CloudManager : MonoBehaviour
         {
             // Gale mode
             case Wizard.Mode.GALE:
-                if (curCloudCnt > 0 && thunderheadPos.ContainsKey(cardinalPos))
+                if (curGaleCloudCnt > 0 && thunderheadPos.ContainsKey(cardinalPos))
                 {
                     // Update combined gale vector
                     CombinedGaleVector -= thunderheadPos[cardinalPos].GetComponent<Thunderhead>().GaleVector;
@@ -225,7 +249,7 @@ public class CloudManager : MonoBehaviour
                     // Dispel thunderhead
                     Destroy(thunderheadPos[cardinalPos]);
                     thunderheadPos[cardinalPos] = null;
-                    curCloudCnt--;
+                    curGaleCloudCnt--;
                 }
                 break;
 
@@ -244,13 +268,13 @@ public class CloudManager : MonoBehaviour
     public void DispelAll()
     {
         CombinedGaleVector = Vector3.zero;
-        curCloudCnt = 0;
+        curGaleCloudCnt = 0;
 
         // Dispel all thunderclouds
-        for (int i = 0; i < cardinalPos.Count; i++)
+        for (int i = 0; i < CardinalPos.Count; i++)
         {
-            Destroy(thunderheadPos[cardinalPos[i]]);
-            thunderheadPos[cardinalPos[i]] = null;
+            Destroy(thunderheadPos[CardinalPos[i]]);
+            thunderheadPos[CardinalPos[i]] = null;
         }
     }
 }

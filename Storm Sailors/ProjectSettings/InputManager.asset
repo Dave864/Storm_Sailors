@@ -314,7 +314,7 @@ InputManager:
     descriptiveName: Dispel all spawned clouds
     descriptiveNegativeName: 
     negativeButton: 
-    positiveButton: left shift
+    positiveButton: q
     altNegativeButton: 
     altPositiveButton: 
     gravity: 1000
