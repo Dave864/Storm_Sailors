@@ -146,6 +146,13 @@ public class Wizard : MonoBehaviour
             
             // Shift from storm mode to gale mode
             case Mode.STORM:
+                // Do not shift if wizard is performing an action
+                if (GetComponent<StormMode>().CurAction != StormMode.Action.DEFAULT)
+                {
+                    shifting = false;
+                    yield break;
+                }
+
                 // Calculate the start and end positions of the mode shift
                 stormPos = transform.localPosition;
                 windPos = new Vector3(0, compassCenter.GetComponent<CompassCenter>().compassRadius, 0);
@@ -155,7 +162,7 @@ public class Wizard : MonoBehaviour
                 if (cloudManager.GetComponent<CloudManager>().StormCloudRef)
                 {
                     int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl;
-                    if (stormLvl < transform.GetComponent<StormMode>().StormLevelSustainable)
+                    if (stormLvl < GetComponent<StormMode>().StormLevelSustainable)
                     {
                         cloudManager.GetComponent<CloudManager>().DispelThunderhead();
                     }

@@ -186,7 +186,6 @@ public class CloudManager : MonoBehaviour
                         heldCloud.transform.parent = transform;
                         thunderheadPos[cardinalPos] = heldCloud;
                         GameObject placedCloud = thunderheadPos[cardinalPos];
-                        curGaleCloudCnt--;
                         
                         // Clear the wizard's held cloud object
                         heldCloud = null;

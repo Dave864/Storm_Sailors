@@ -119,24 +119,28 @@ public class GaleMode : MonoBehaviour
             dispelAllTime *= dispelAllMult.Evaluate(cloudManager.GetComponent<CloudManager>().CurGaleCloudCnt);
         }
 
-        // See if player holds dispel button long enough to execute action
-        cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 1;
-        while (Input.GetButton("Dispel All") && !actionActivated)
+        // Attempt to execute dispel all action if there are clouds to dispel
+        if (cloudManager.GetComponent<CloudManager>().CurGaleCloudCnt > 0)
         {
-            cloudTimerSlider.value = curTime / dispelAllTime;
-            curTime += Time.deltaTime;
-            if (curTime >= dispelAllTime)
+            // See if player holds dispel button long enough to execute action
+            cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 1;
+            while (Input.GetButton("Dispel All") && !actionActivated)
             {
-                actionActivated = true;
+                cloudTimerSlider.value = curTime / dispelAllTime;
+                curTime += Time.deltaTime;
+                if (curTime >= dispelAllTime)
+                {
+                    actionActivated = true;
+                }
+                yield return null;
             }
-            yield return null;
-        }
-        cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
+            cloudTimerSlider.GetComponent<CanvasGroup>().alpha = 0;
 
-        // Execute the dispel all action
-        if (actionActivated)
-        {
-            cloudManager.GetComponent<CloudManager>().DispelAll();
+            // Execute the dispel all action
+            if (actionActivated)
+            {
+                cloudManager.GetComponent<CloudManager>().DispelAll();
+            }
         }
         yield return null;
     }

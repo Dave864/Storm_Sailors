@@ -26,7 +26,7 @@ public class LaunchVector : MonoBehaviour
         if (wizardObject.GetComponent<Wizard>().CurMode == Wizard.Mode.STORM)
         {
             // Display the launch vector sprite if not shifting back to gale mode
-            if (!shiftingToGaleMode)
+            if (!shiftingToGaleMode && wizardObject.GetComponent<StormMode>().CurAction == StormMode.Action.DEFAULT)
             {
                 shiftingToGaleMode = Input.GetButtonDown("Change Mode");
             }

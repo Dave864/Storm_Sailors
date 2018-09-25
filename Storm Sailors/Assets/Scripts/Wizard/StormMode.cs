@@ -8,6 +8,7 @@ public class StormMode : MonoBehaviour
     // Enumerator for the various actions in Storm mode
     public enum Action { DEFAULT, CHARGE, GATHER, LAUNCH }
     private Action curAction = Action.DEFAULT;
+    public Action CurAction { get { return curAction; } }
 
     // Storm mode timer variables
     [SerializeField] private Slider stormTimerSlider;        // UI Slider object to serve as timer

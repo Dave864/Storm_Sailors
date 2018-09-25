@@ -181,4 +181,20 @@ public class Thunderhead : MonoBehaviour
                 break;
         }
     }
+
+    // Handle collision
+    public void OnTriggerStay(Collider other)
+    {
+        switch (curState)
+        {
+            case ThunderheadState.STORMFRONT:
+                if (wizardObject.GetComponent<Wizard>().CurMode == Wizard.Mode.GALE && other.CompareTag("Enemy"))
+                {
+                    Destroy(other.gameObject);
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
