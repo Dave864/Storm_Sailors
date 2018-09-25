@@ -9,7 +9,7 @@ public class StormMode : MonoBehaviour
     public enum Action { DEFAULT, CHARGE, GATHER, LAUNCH }
     private Action curAction = Action.DEFAULT;
 
-    // Wizard storm mode timer variables
+    // Storm mode timer variables
     [SerializeField] private Slider stormTimerSlider;        // UI Slider object to serve as timer
     [SerializeField] private AnimationCurve stormChargeMult; // Curve to determine the timer multiplier for charging storm cloud
     [SerializeField] private float stormSpawnTime = 0.5f;    // The time to spawn intial storm cloud
@@ -22,6 +22,9 @@ public class StormMode : MonoBehaviour
     [SerializeField] private int stormLevelOverload = 5;
     public int StormLevelSustainable { get { return stormLevelSustainable; } }
     public int StormLevelOverload { get { return stormLevelOverload; } }
+
+    // Radius of sustained storm cloud range
+    [SerializeField] private float stormFrontRange = 10f;
 
     // Reference to game objects
     private GameObject compassCenter;
@@ -79,6 +82,10 @@ public class StormMode : MonoBehaviour
             {
                 StartCoroutine(GatherGaleClouds());
             }
+        }
+        else if (GetComponent<Wizard>().CurMode == Wizard.Mode.GALE)
+        {
+            // Call lightning strikes on enemies in range
         }
     }
 
@@ -150,6 +157,11 @@ public class StormMode : MonoBehaviour
                     cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
                     stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
                 }
+                // Call a lightning strike at mouse position (TODO)
+                else
+                {
+
+                }
             }
             curAction = Action.DEFAULT;
         }
@@ -208,9 +220,16 @@ public class StormMode : MonoBehaviour
             // Strengthen the storm cloud
             if (actionActivated)
             {
-                cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl++;
+                GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
+                stormCloud.GetComponent<Thunderhead>().GaleLvl++;
+
+                // Change the storm cloud to a storm front
+                if (stormLvl + 1 == StormLevelSustainable)
+                {
+                    stormCloud.GetComponent<Thunderhead>().StormFront(stormFrontRange);
+                }
                 // Dispel storm cloud if overcharged (TEMPORARY)
-                if (stormLvl + 1 > StormLevelOverload)
+                else if (stormLvl + 1 > StormLevelOverload)
                 {
                     cloudManager.GetComponent<CloudManager>().DispelThunderhead();
                 }
@@ -254,7 +273,7 @@ public class StormMode : MonoBehaviour
             movingClouds[i] = StartCoroutine(MoveGaleToStorm(spawnedGaleClouds[i], galeCloudPositions[i]));
         }
 
-        // Wait for the clouds to finish moving
+        // Wait for the gale clouds to finish moving
         for (int i = 0; i < movingClouds.Length; i++)
         {
             yield return movingClouds[i];
@@ -268,6 +287,12 @@ public class StormMode : MonoBehaviour
             yield return null;
         }
 
+        // Change storm cloud to storm front if it is at a sustainable level
+        GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
+        if (stormCloud && stormCloud.GetComponent<Thunderhead>().GaleLvl >= StormLevelSustainable)
+        {
+            stormCloud.GetComponent<Thunderhead>().StormFront(stormFrontRange);
+        }
         curAction = Action.DEFAULT;
         yield return null;
     }

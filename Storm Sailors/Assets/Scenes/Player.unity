@@ -1369,6 +1369,7 @@ MonoBehaviour:
   stormGatherTime: 0.75
   stormLevelSustainable: 4
   stormLevelOverload: 6
+  sustainedStormRange: 18
 --- !u!1 &2035762855
 GameObject:
   m_ObjectHideFlags: 0

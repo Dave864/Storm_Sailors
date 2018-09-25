@@ -209,12 +209,14 @@ public class CloudManager : MonoBehaviour
             // Storm Mode
             case Wizard.Mode.STORM:
                 // Make held cloud the storm cloud
+                // (Place held cloud at storm cloud position)
                 if (!StormCloudRef)
                 {
                     StormCloudRef = heldCloud;
                     StormCloudRef.transform.parent = transform;
                 }
                 // Merge held cloud into storm cloud
+                // (Place held cloud into storm cloud)
                 else
                 {
                     StormCloudRef.GetComponent<Thunderhead>().Merge(heldCloud);
@@ -257,6 +259,7 @@ public class CloudManager : MonoBehaviour
             case Wizard.Mode.STORM:
                 // Dispel storm thunderhead
                 Destroy(StormCloudRef);
+                StormCloudRef = null;
                 break;
 
             default:

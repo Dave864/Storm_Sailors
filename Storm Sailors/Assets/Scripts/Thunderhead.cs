@@ -8,7 +8,7 @@ public class Thunderhead : MonoBehaviour
     public enum ThunderheadState { DEFAULT, HELD, LAUNCHED, STORMFRONT }
     private ThunderheadState curState = ThunderheadState.DEFAULT;
 
-    // Flag indicating if the tunderhead is being held
+    // Flag indicating if the thunderhead is being held
     [HideInInspector] public bool IsHeld
     {
         get { return curState == ThunderheadState.HELD; }
@@ -33,6 +33,7 @@ public class Thunderhead : MonoBehaviour
 
     // Reference to game objects
     private GameObject compassCenter;
+    private GameObject wizardObject;
     private LineRenderer launchEffectArea;
 
     // Initializes the thuderhead
@@ -47,14 +48,6 @@ public class Thunderhead : MonoBehaviour
         galeVector = compassCenter.transform.position - transform.position;
         GaleLvl = 1;
 
-        // Get the reference to the thunderhead's line renderer
-        launchEffectArea = GetComponent<LineRenderer>();
-        if (!launchEffectArea)
-        {
-            Debug.LogError("No Line Renderer attached to thunderhead", launchEffectArea);
-        }
-        launchEffectArea.enabled = false;
-
         // Set the launch effect radius
         CapsuleCollider collisionShape = GetComponent<CapsuleCollider>();
         if (collisionShape)
@@ -64,6 +57,21 @@ public class Thunderhead : MonoBehaviour
         else
         {
             Debug.LogError("No Capsule Collision Shape attached to thunderhead", collisionShape);
+        }
+
+        // Get the reference to the thunderhead's line renderer
+        launchEffectArea = GetComponent<LineRenderer>();
+        if (!launchEffectArea)
+        {
+            Debug.LogError("No Line Renderer attached to thunderhead", launchEffectArea);
+        }
+        launchEffectArea.enabled = false;
+
+        // Get the reference to the wizard object
+        wizardObject = GameObject.Find("Wizard Object");
+        if (!wizardObject)
+        {
+            Debug.LogError("Wizard object not found");
         }
     }
 
@@ -144,13 +152,33 @@ public class Thunderhead : MonoBehaviour
         transform.SetParent(null);
     }
 
+    // Change thunderhead to stormfront
+    public void StormFront(float stormFrontRange)
+    {
+        curState = ThunderheadState.STORMFRONT;
+        transform.GetComponent<CapsuleCollider>().radius = stormFrontRange;
+    }
+
     // Handle collisions
     public void OnTriggerEnter(Collider other)
     {
-        if (curState == ThunderheadState.LAUNCHED && other.CompareTag("Obstacle"))
+        switch (curState)
         {
-            Destroy(other.gameObject);
-            Destroy(gameObject);
+            case ThunderheadState.LAUNCHED:
+                if (other.CompareTag("Obstacle"))
+                {
+                    Destroy(other.gameObject);
+                    Destroy(gameObject);
+                }
+                break;
+            case ThunderheadState.STORMFRONT:
+                if (wizardObject.GetComponent<Wizard>().CurMode == Wizard.Mode.GALE && other.CompareTag("Enemy"))
+                {
+                    Destroy(other.gameObject);
+                }
+                break;
+            default:
+                break;
         }
     }
 }

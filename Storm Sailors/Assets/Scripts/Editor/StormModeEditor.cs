@@ -14,6 +14,7 @@ public class StormModeEditor : Editor
     SerializedProperty s_stormTimerSlider;
     SerializedProperty s_stormLevelSustainable;
     SerializedProperty s_stormLevelOverload;
+    SerializedProperty s_stormFrontRange;
 
     // Range values for storm level GUI
     private readonly int maxLevel = 10;
@@ -22,6 +23,9 @@ public class StormModeEditor : Editor
 
     // Value of level to check
     int lvlToCheck;
+
+    // Reference to gameobjects
+    GameObject compassCenter;
 
     // Use this for initialization
     void OnEnable()
@@ -33,9 +37,17 @@ public class StormModeEditor : Editor
         s_stormTimerSlider = serializedObject.FindProperty("stormTimerSlider");
         s_stormLevelSustainable = serializedObject.FindProperty("stormLevelSustainable");
         s_stormLevelOverload = serializedObject.FindProperty("stormLevelOverload");
+        s_stormFrontRange = serializedObject.FindProperty("stormFrontRange");
         minStormValue = s_stormLevelSustainable.intValue;
         maxStormValue = s_stormLevelOverload.intValue;
         lvlToCheck = 0;
+
+        // Get reference to compass center object
+        compassCenter = GameObject.Find("Compass Center");
+        if (!compassCenter)
+        {
+            Debug.LogError("Compass Center object not found", compassCenter);
+        }
 	}
 
     public override void OnInspectorGUI()
@@ -56,6 +68,14 @@ public class StormModeEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             s_stormGatherTime.floatValue = gatherTime;
+        }
+
+        // Set storm front auto strike range
+        EditorGUI.BeginChangeCheck();
+        float rangeRadius = EditorGUILayout.DelayedFloatField("Lightning Strike Range", s_stormFrontRange.floatValue);
+        if (EditorGUI.EndChangeCheck())
+        {
+            s_stormFrontRange.floatValue = (rangeRadius < 0) ? 0f : rangeRadius;
         }
 
         EditorGUILayout.BeginVertical("Box");
@@ -104,5 +124,43 @@ public class StormModeEditor : Editor
         EditorGUILayout.PropertyField(s_stormTimerSlider);
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    private void OnSceneGUI()
+    {
+        Vector3 rangeHandlePos = compassCenter.transform.position;
+        rangeHandlePos.y = 0;
+
+        // Create handle to adjust the radius of the range of the storm front auto strike
+        serializedObject.Update();
+        EditorGUI.BeginChangeCheck();
+        float newRange = Handles.ScaleSlider
+            (
+                s_stormFrontRange.floatValue,
+                rangeHandlePos,
+                -compassCenter.transform.up,
+                Quaternion.identity,
+                HandleUtility.GetHandleSize(compassCenter.transform.position),
+                1.0f
+            );
+        if (EditorGUI.EndChangeCheck())
+        {
+            s_stormFrontRange.floatValue = (newRange < 0) ? 0 : newRange;
+        }
+        serializedObject.ApplyModifiedProperties();
+
+        // Draw markers to provide context for the different variables
+        if (Event.current.type == EventType.Repaint)
+        {
+            // Create a circle with the radius of the range of the storm front auto strike
+            Handles.CircleHandleCap
+                (
+                    0, 
+                    rangeHandlePos,
+                    Quaternion.Euler(90f, 0, 0), 
+                    s_stormFrontRange.floatValue, 
+                    EventType.repaint
+                );
+        }
     }
 }
