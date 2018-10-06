@@ -101,45 +101,49 @@ public class Wizard : MonoBehaviour
         {
             // Shift from gale mode to storm mode
             case Mode.GALE:
-                // Don't shift modes if wizard is changing compass position
-                if (!GetComponent<GaleMode>().Positioning)
+                // Do not shift if wizard is performing an action
+                if (GetComponent<GaleMode>().CurAction != GaleMode.Action.GRAB && GetComponent<GaleMode>().CurAction != GaleMode.Action.DEFAULT)
                 {
-                    // Calculate the start and end positions of the mode shift
-                    windPos = transform.localPosition;
-                    stormPos = new Vector3(0, 0, compassCenter.transform.position.y - compassCenter.GetComponent<CompassCenter>().stormHeight);
-                    stormRot = shipObject.transform.rotation;
-                    curCompassRot = transform.rotation;
-
-                    // Get the start rotation of the held thunderhead
-                    thunderheadRot = (heldCloud != null) ? heldCloud.transform.rotation : Quaternion.identity;
-                    if (heldCloud)
-                    {
-                        heldCloud.GetComponent<Thunderhead>().IsHeld = false;
-                    }
-
-                    // Move wizard to storm mode position
-                    for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
-                    {
-                        transform.localPosition = Vector3.Slerp(windPos, stormPos, shiftTime / shiftRate);
-                        transform.rotation = Quaternion.Slerp(curCompassRot, stormRot, shiftTime / shiftRate);
-
-                        // Rotate held cloud
-                        if (heldCloud)
-                        {
-                            heldCloud.transform.rotation = Quaternion.Slerp(thunderheadRot, stormRot, shiftTime / shiftRate);
-                        }
-                        yield return null;
-                    }
-                    transform.localPosition = stormPos;
-                    transform.rotation = stormRot;
-                    curMode = Mode.STORM;
-
-                    // Merge held cloud into storm cloud
-                    if (heldCloud)
-                    {
-                        cloudManager.GetComponent<CloudManager>().MoveThunderHead(Vector2.zero, ref heldCloud);
-                    }
+                    shifting = false;
+                    yield break;
                 }
+
+                // Calculate the start and end positions of the mode shift
+                windPos = transform.localPosition;
+                stormPos = new Vector3(0, 0, compassCenter.transform.position.y - compassCenter.GetComponent<CompassCenter>().stormHeight);
+                stormRot = shipObject.transform.rotation;
+                curCompassRot = transform.rotation;
+
+                // Get the start rotation of the held thunderhead
+                thunderheadRot = (heldCloud != null) ? heldCloud.transform.rotation : Quaternion.identity;
+                if (heldCloud)
+                {
+                    heldCloud.GetComponent<Thunderhead>().IsHeld = false;
+                }
+
+                // Move wizard to storm mode position
+                for (float shiftTime = 0; shiftTime < shiftRate; shiftTime += Time.deltaTime)
+                {
+                    transform.localPosition = Vector3.Slerp(windPos, stormPos, shiftTime / shiftRate);
+                    transform.rotation = Quaternion.Slerp(curCompassRot, stormRot, shiftTime / shiftRate);
+
+                    // Rotate held cloud
+                    if (heldCloud)
+                    {
+                        heldCloud.transform.rotation = Quaternion.Slerp(thunderheadRot, stormRot, shiftTime / shiftRate);
+                    }
+                    yield return null;
+                }
+                transform.localPosition = stormPos;
+                transform.rotation = stormRot;
+                curMode = Mode.STORM;
+
+                // Merge held cloud into storm cloud
+                if (heldCloud)
+                {
+                    cloudManager.GetComponent<CloudManager>().MoveThunderHead(Vector2.zero, ref heldCloud);
+                }
+
                 shifting = false;
                 yield return null;
                 break;
@@ -161,7 +165,7 @@ public class Wizard : MonoBehaviour
                 // Dispel storm cloud if cloud is not at a sustainable level
                 if (cloudManager.GetComponent<CloudManager>().StormCloudRef)
                 {
-                    int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl;
+                    int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().CloudLvl;
                     if (stormLvl < GetComponent<StormMode>().StormLevelSustainable)
                     {
                         cloudManager.GetComponent<CloudManager>().DispelThunderhead();

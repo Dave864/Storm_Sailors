@@ -174,7 +174,7 @@ public class CloudManager : MonoBehaviour
                         curGaleCloudCnt--;
 
                         // Dispel cloud if new level exceeds overload level
-                        if (wizardObject.GetComponent<GaleMode>().CloudLevelOverload < thunderheadPos[cardinalPos].GetComponent<Thunderhead>().GaleLvl)
+                        if (wizardObject.GetComponent<GaleMode>().CloudLevelOverload < thunderheadPos[cardinalPos].GetComponent<Thunderhead>().CloudLvl)
                         {
                             DispelThunderhead(cardinalPos);
                         }
@@ -221,7 +221,7 @@ public class CloudManager : MonoBehaviour
                     StormCloudRef.GetComponent<Thunderhead>().Merge(heldCloud);
 
                     // If the new gale level goes above the overload level, the storm cloud "explodes"
-                    if (wizardObject.GetComponent<StormMode>().StormLevelOverload < StormCloudRef.GetComponent<Thunderhead>().GaleLvl)
+                    if (wizardObject.GetComponent<StormMode>().StormLevelOverload < StormCloudRef.GetComponent<Thunderhead>().CloudLvl)
                     {
                         DispelThunderhead();
                     }

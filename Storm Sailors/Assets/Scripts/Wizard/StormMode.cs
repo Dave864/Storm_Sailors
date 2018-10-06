@@ -153,7 +153,7 @@ public class StormMode : MonoBehaviour
             if (stormCloud)
             {
                 // Launch storm cloud if it is not sustainable
-                if (stormCloud.GetComponent<Thunderhead>().GaleLvl < stormLevelSustainable)
+                if (stormCloud.GetComponent<Thunderhead>().CloudLvl < stormLevelSustainable)
                 {
                     cloudManager.GetComponent<CloudManager>().StormCloudRef = null;
                     stormCloud.GetComponent<Thunderhead>().Launch(transform.forward);
@@ -161,7 +161,28 @@ public class StormMode : MonoBehaviour
                 // Call a lightning strike at mouse position (TODO)
                 else
                 {
+                    if (Input.mousePresent)
+                    {
+                        // Translate the mouse position to in game world position
+                        Vector2 mousePos = Input.mousePosition;
+                        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, Camera.main.nearClipPlane));
 
+                        // Raycast the mouse position find the apparent mouse position on the sea
+                        Vector3 mouseSeaPosition = new Vector3();
+                        RaycastHit mouseRayHit;
+                        int layerMask = 1 << 4;
+                        if (Physics.Raycast(mouseWorldPosition, Camera.main.transform.forward, out mouseRayHit, Mathf.Infinity, layerMask))
+                        {
+                            mouseSeaPosition = mouseRayHit.point;
+                        }
+                        else
+                        {
+                            mouseSeaPosition = mouseWorldPosition;
+                        }
+
+                        // Call lightning at position
+                        StartCoroutine(stormCloud.GetComponent<Thunderhead>().CallLightning(mouseSeaPosition));
+                    }
                 }
             }
             curAction = Action.DEFAULT;
@@ -202,7 +223,7 @@ public class StormMode : MonoBehaviour
         // Check to see if the storm cloud is strengthened
         else
         {
-            int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().GaleLvl;
+            int stormLvl = cloudManager.GetComponent<CloudManager>().StormCloudRef.GetComponent<Thunderhead>().CloudLvl;
             chargeTime = stormSpawnTime;
             chargeTime *= (stormChargeMult != null) ? stormChargeMult.Evaluate(stormLvl + 1) : stormLvl + 1;
 
@@ -222,12 +243,12 @@ public class StormMode : MonoBehaviour
             if (actionActivated)
             {
                 GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
-                stormCloud.GetComponent<Thunderhead>().GaleLvl++;
+                stormCloud.GetComponent<Thunderhead>().CloudLvl++;
 
                 // Change the storm cloud to a storm front
                 if (stormLvl + 1 == StormLevelSustainable)
                 {
-                    stormCloud.GetComponent<Thunderhead>().StormFront(stormFrontRange);
+                    stormCloud.GetComponent<Thunderhead>().MakeStormFront(stormFrontRange);
                 }
                 // Dispel storm cloud if overcharged (TEMPORARY)
                 else if (stormLvl + 1 > StormLevelOverload)
@@ -290,9 +311,9 @@ public class StormMode : MonoBehaviour
 
         // Change storm cloud to storm front if it is at a sustainable level
         GameObject stormCloud = cloudManager.GetComponent<CloudManager>().StormCloudRef;
-        if (stormCloud && stormCloud.GetComponent<Thunderhead>().GaleLvl >= StormLevelSustainable)
+        if (stormCloud && stormCloud.GetComponent<Thunderhead>().CloudLvl >= StormLevelSustainable)
         {
-            stormCloud.GetComponent<Thunderhead>().StormFront(stormFrontRange);
+            stormCloud.GetComponent<Thunderhead>().MakeStormFront(stormFrontRange);
         }
         curAction = Action.DEFAULT;
         yield return null;

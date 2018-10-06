@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StormTimerSlider : MonoBehaviour
 {
-    private readonly float heightScale = 1.2f;
+    public float heightScale = 1.2f;
 
 	// Use this for initialization
 	void Start()
